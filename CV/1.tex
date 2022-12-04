@@ -1,0 +1,366 @@
+%-----------------------------------------------------------------------------------------------------------------------------------------------%
+%	The MIT License (MIT)
+%
+%	Copyright (c) 2021 Jitin Nair
+%
+%	Permission is hereby granted, free of charge, to any person obtaining a copy
+%	of this software and associated documentation files (the "Software"), to deal
+%	in the Software without restriction, including without limitation the rights
+%	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+%	copies of the Software, and to permit persons to whom the Software is
+%	furnished to do so, subject to the following conditions:
+%	
+%	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+%	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+%	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+%	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+%	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+%	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+%	THE SOFTWARE.
+%	
+%
+%-----------------------------------------------------------------------------------------------------------------------------------------------%
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT DEFINITION
+%----------------------------------------------------------------------------------------
+
+% article class because we want to fully customize the page and not use a cv template
+\documentclass[letter,12pt]{article}
+
+%----------------------------------------------------------------------------------------
+%	FONT
+%----------------------------------------------------------------------------------------
+
+% % fontspec allows you to use TTF/OTF fonts directly
+% \usepackage{fontspec}
+% \defaultfontfeatures{Ligatures=TeX}
+
+% % modified for ShareLaTeX use
+% \setmainfont[
+% SmallCapsFont = Fontin-SmallCaps.otf,
+% BoldFont = Fontin-Bold.otf,
+% ItalicFont = Fontin-Italic.otf
+% ]
+% {Fontin.otf}
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES
+%----------------------------------------------------------------------------------------
+\usepackage{url}
+\usepackage{parskip} 	
+
+%other packages for formatting
+\RequirePackage{color}
+\RequirePackage{graphicx}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage[scale=0.9]{geometry}
+
+%tabularx environment
+\usepackage{tabularx}
+
+%for lists within experience section
+\usepackage{enumitem}
+
+% centered version of 'X' col. type
+\newcolumntype{C}{>{\centering\arraybackslash}X} 
+
+%to prevent spillover of tabular into next pages
+\usepackage{supertabular}
+\usepackage{tabularx}
+\newlength{\fullcollw}
+\setlength{\fullcollw}{0.47\textwidth}
+
+%custom \section
+\usepackage{titlesec}				
+\usepackage{multicol}
+\usepackage{multirow}
+
+%CV Sections inspired by: 
+%http://stefano.italians.nl/archives/26
+\titleformat{\section}{\Large\scshape\raggedright}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{10pt}{10pt}
+
+%for publications
+\usepackage[style=authoryear,sorting=ynt, maxbibnames=2]{biblatex}
+
+%Setup hyperref package, and colours for links
+\usepackage[unicode, draft=false]{hyperref}
+\definecolor{linkcolour}{rgb}{0,0.2,0.6}
+\hypersetup{colorlinks,breaklinks,urlcolor=linkcolour,linkcolor=linkcolour}
+\addbibresource{citations.bib}
+\setlength\bibitemsep{1em}
+
+%for social icons
+\usepackage{fontawesome5}
+
+%debug page outer frames
+%\usepackage{showframe}
+
+%font and icon packages
+\usepackage{wasysym}
+
+
+%----------------------------------------------------------------------------------------
+%	BEGIN DOCUMENT
+%----------------------------------------------------------------------------------------
+\begin{document}
+
+% non-numbered pages
+\pagestyle{empty} 
+
+%----------------------------------------------------------------------------------------
+%	TITLE
+%----------------------------------------------------------------------------------------
+
+% \begin{tabularx}{\linewidth}{ @{}X X@{} }
+% \huge{Your Name}\vspace{2pt} & \hfill \emoji{incoming-envelope} email@email.com \\
+% \raisebox{-0.05\height}\faGithub\ username \ | \
+% \raisebox{-0.00\height}\faLinkedin\ username \ | \ \raisebox{-0.05\height}\faGlobe \ mysite.com  & \hfill \emoji{calling} number
+% \end{tabularx}
+
+\begin{tabularx}{\linewidth}{@{} C @{}}
+\Huge{Mojtaba Alehosseini} \\[7.5pt]
+\href{mailto:alehoseini.mojtaba@gmail.com}{\raisebox{-0.05\height}\faEnvelope \ \color{black}Alehoseini.Mojtaba@gmail.com} \ $|$ \ 
+\href{https://github.com/Mojtaba-Alehosseini}{\raisebox{-0.05\height}\faGithub\ \color{black} Mojtaba-Alehosseini}  \ $|$ \ 
+\href{https://Mojtaba-Alehosseini.github.io}{\faGithubSquare \ \color{black} GitHub.io} \ $|$ \ 
+\href{https://linkedin.com/in/Mojtaba-Alehosseini}{\raisebox{-0.05\height}\faLinkedin\ \color{black}Mojtaba-Alehosseini}
+%\href{https://mysite.com}{\raisebox{-0.05\height}\faGlobe \ mysite.com} \ $|$ \ 
+%\href{tel:+000000000000}{\raisebox{-0.05\height}\faMobile \ +00.00.000.000} \\
+\end{tabularx}
+
+
+%----------------------------------------------------------------------------------------
+%	EDUCATION
+%----------------------------------------------------------------------------------------
+\section{Education}
+\begin{tabularx}{\linewidth}{@{}l X@{}}	
+%2022 - present & MSc Computer Science (Data Mining) at \textbf{Shaid Beheshti University/Iran} \\
+
+% \faGraduationCap
+2017 - 2022 \normalsize \hspace{1cm}  B.Sc. Computer Science at \emph{Yazd University/Iran} \\
+
+Selected Courses:   \hfill (GPA: 17/20) \\ 
+\scriptsize \hspace{3cm} Advanced Programming (Grade: 19), Theory of Computation (Grade: 18.25), Operating Systems (Grade: 18.5),\\
+\scriptsize \hspace{3cm} Artificial intelligence (Grade: 17), Computer Networks (Grade: 18.1), Computer Simulation (Grade: 17.75),\\
+\scriptsize \hspace{3cm} General Mathematics III (Grade: 19), Linear Optimization (Grade: 17.5), Linear Algebra (Grade: 14.25),\\
+\scriptsize \hspace{3cm} Data Mining (Grade: 15.75), Databases (Grade: 16.25), Algorithms (Grade: 14.5), Data Structures (Grade: 15),\\
+\scriptsize \hspace{3cm} Complex Analysis (Grade: 16), Differential Equations (Grade: 16), General Physics I (Grade: 19.25)\\
+
+\end{tabularx}
+
+
+
+%----------------------------------------------------------------------------------------
+% Interest
+%----------------------------------------------------------------------------------------
+
+%Interests/ Keywords/ Summary
+\section{Interests}
+Machine learning, Deep learning, Big data, Data Analysis, Blockchain, Web3, and Distributed Systems.\\
+
+%\setlength{\tabcolsep}{1pt}
+\vspace{-0.5cm}
+
+%Projects
+\section{Selected Projects}
+
+\begin{tabularx}{\linewidth}{ @{}l r@{} }
+
+
+Identification of pneumonia based on a deep learning approach.  \href{https://github.com/mojtaba96/Pneumonia_X_ray_transfer_learning}{\faGithub} \\
+\footnotesize \hspace{1cm} Implemented convolutional neural network, using different architectures like VGG, ResNet, NASnet.\\[3.75pt]
+
+
+Implementing and investigating the performance of classification algorithms such as decision tree,\\
+K-nearest neighbor, logistic regression and random forest to:\\
+\hspace{1cm}Predict whether a person requires Covid test using these symptoms.\href{https://github.com/mojtaba96/Covid-19}{\faGithub}\\
+\hspace{1cm}Classifying patients with liver problems in a clinical data set.   \href{https://github.com/mojtaba96/ILPD-Data-Mining}{\faGithub}\\
+\hspace{2cm}\footnotesize  Experimenting and identified best features for different algorithms.\\
+\hspace{2cm}\footnotesize  Performing data normalization using different methods (Min-Max, z-score).\\
+\hspace{2cm}\footnotesize  Performing N-fold cross-validation on the data set.\\
+\hspace{2cm}\footnotesize  Comparing precision, recall and F-score of the algorithms.\\[3.75pt]
+
+
+Developing a System Modeling and Simulation for:\\
+\hspace{2cm}Newspaper Seller's Problem \footnotesize using VBA in Office Excel. 
+\href{https://github.com/mojtaba96/Newspaper-Seller-s-Problem}{\faGithub} \\
+\hspace{2cm}Replacing Bearings in a Milling Machine \footnotesize using Python in Jupyter notebook. 
+\href{https://github.com/mojtaba96/Replacing-Bearings-in-a-Milling-Machine}{\faGithub} \\
+\hspace{2cm}The Dump Truck Problem \footnotesize using VBA in Office Excel.  \href{https://github.com/mojtaba96/The-Dump-Truck-Problem}{\faGithub}
+\\[3.75pt]
+
+
+Implementing the Genetic Algorithm and particle swarm optimization \href{https://github.com/mojtaba96/Genetic-Algorithm}{\faGithub}\\
+\hspace{1cm}\footnotesize in Matlab and Python with the aim of applying them to the search of the optimum solution of multiple complex functions. \\[3.75pt]
+
+Advanced implementation of regression modelling techniques  like lasso regression in Python.   \href{https://github.com/mojtaba96/Multiple_Regression_Lasso_Regression}{\faGithub} \\[3.75pt]
+
+Implementing the Topic analysis technique in natural language processing.   \href{https://github.com/mojtaba96/NLP}{\faGithub} \\[3.75pt]
+
+Implementation of CNN using Keras for classification of MNIST dataset.   \href{https://github.com/mojtaba96/mnist}{\faGithub} \\[3.75pt]
+
+Implementation of rgb2gray to convert RGB image to grayscale without using OpenCV.  \href{https://github.com/mojtaba96/rgb2gray}{\faGithub} \\[3.75pt]
+
+Translation of motion into object (motion of a mouse depicting a number) using Python. \\[3.75pt]
+
+Implementing a chat box interface to the networking connection of two computers. \href{https://github.com/mojtaba96/computer-network}{\faGithub}
+\\[3.75pt]
+
+
+Strassen's Matrix Multiplication Algorithm with C++.  \href{https://github.com/mojtaba96/simple-Strassen-Matrix-Multiplication}{\faGithub} \\[3.75pt]
+
+Deriving data structure to eliminate vertices in a tree structure. \href{https://github.com/mojtaba96/Transaction-Optimization}{\faGithub} \\[3.75pt]
+
+%Optimally threaded execution of an OS-like program. \\[3.75pt]
+
+%Developing a probability calculator function for a coin tossing game.   \href{https://github.com/mojtaba96/Coin-Tossing-Game}{\faGithub} \\[3.75pt]
+
+Deriving and implementing a gym registration software \footnotesize using SQL as the database and C\# in Visual Studio. \\[3.75pt]
+
+Developing a restaurant software with C++  \footnotesize to scan and analyze daily transaction data files.
+\href{https://github.com/mojtaba96/Restaurant-Management}{\faGithub} \\[3.75pt]
+
+%\textbf{Developed a phonebook software with C++.}   \href{https://github.com/mojtaba96/Phonebook}{\faGithub} \\[3.75pt]
+
+
+\end{tabularx}
+
+
+
+%----------------------------------------------------------------------------------------
+%	SKILLS
+%----------------------------------------------------------------------------------------
+\section{Skills}
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+\textbf{Industry Knowledge} &  \normalsize{Machine Learning, Operating Systems, Computer hardware expertise}\\
+\textbf{Programming Languages}  &  \normalsize{C++, C, Python, MATLAB }\\ 
+\textbf{General} &  \normalsize{\LaTeX  ,Microsoft Excel, Microsoft office}\\ 
+\textbf{Soft Skills} &  \normalsize{Teamworking, Teaching, Self-Learning, Problem-Solving, Deep work.}\\ 
+\end{tabularx}
+
+
+
+%Experience
+\section{Work Experiences}
+
+\begin{tabularx}{\linewidth}{ @{}l r@{} }
+\textbf{System Administrator, Setare Talaee Co., Delijan, Iran} & \hfill 2021 - 2022 \\[1pt]
+\multicolumn{2}{@{}X@{}}{As an IT member of Setare Talaee Co. I was responsible for supporting, troubleshooting, and maintaining computer servers and networks.} \\
+\end{tabularx}
+\vspace{-0.1cm}
+
+\begin{tabularx}{\linewidth}{ @{}l r@{} }
+\textbf{I was the co-founder of Pinfopedia,} which is a startup company in the field of IT and commercial \\
+data sorting and holograming. \\
+\end{tabularx}
+\vspace{-0.3cm}
+
+\begin{tabularx}{\linewidth}{ @{}l X@{} }
+\textbf{Network administrator assistant at Yazd University, Yazd, Iran} & \hfill 2018 - 2019 \\
+\end{tabularx}
+
+\vspace{-0.1cm}
+
+\begin{tabularx}{\linewidth}{ @{}l r@{} }
+\textbf{Riggosaurus mining}  (a mining project which used graphical data processing in sequences with the \\
+aim of selecting the optimal cryptocurrency to mine at a given time interval).\\
+\end{tabularx}
+
+%----------
+%Teaching Assistant Experience
+%----------
+
+%TA
+\section{Teaching Assistant Experiences}
+
+\begin{tabularx}{\linewidth}{ @{}l X@{} }
+Advanced Programming & \hfill Yazd University, Fall 2020 \\[0pt]
+\end{tabularx}
+\vspace{-0.7cm}
+
+\begin{tabularx}{\linewidth}{ @{}l X@{} }
+Introduction to Programming & \hfill Yazd University, Fall 2019 \\
+\end{tabularx}
+\vspace{-0.7cm}
+
+
+
+%----------
+%Other activities 
+%----------
+
+%Other activities
+\section{Other activities}
+
+\begin{tabularx}{\linewidth}{ @{}l X@{} }
+\textbf{Secretary of Scientific Computer Science Association of Yazd University for 2 years.}\\
+\footnotesize Our association was named the 2nd best scientific association in Yazd University. I held and managed lots of contests.\\
+
+
+\end{tabularx}
+%\vspace{-0.7cm}
+
+\begin{tabularx}{\linewidth}{ @{}l X@{} }
+\textbf{The scientific editor of DigiaTech} \footnotesize (which was a journal published by the scientific association of computer\\
+\footnotesize sciences of Yazd University). I published a review article on machine learning methods and another one on data mining.\\
+\end{tabularx}
+
+\begin{tabularx}{\linewidth}{ @{}l X@{} }
+\textbf{The Translator of SimPy library manual (from English to Persian).}  \href{https://github.com/mojtaba96/Persian-Translation-of-Simpy}{\faGithub} \\
+\end{tabularx}
+
+
+
+%----------
+%Honors & Awards
+%----------
+
+%Awards
+\section{Honors and Awards}
+
+\begin{tabularx}{\linewidth}{ @{}l X@{} }
+\textbf{Ranked in the top 2\%} of nearly 500,000 participants in the nationwide university entrance\\
+exam, mathematics and physics section, 2017.
+\end{tabularx}
+
+\begin{tabularx}{\linewidth}{ @{}l X@{} }
+\textbf{Ranked the 3rd} highest scoring student of computer sciences of Yazd University, 2021 \\
+\end{tabularx}
+
+
+
+%----------
+%References
+%----------
+
+%Awards
+\section{References}
+
+\begin{tabularx}{\linewidth}{ @{}l X@{} }
+\href{https://pws.yazd.ac.ir/jzarepour/}{\textbf{\color{black}Dr. Jamal Zarepour}}\\
+\hspace{0.9cm}Assistant Professor of Computer Science Department, Yazd University, Yazd, Iran \\
+\hspace{0.9cm}Email Address: \href{mailto:zarepourjamal@yazd.ac.ir}{zarepourjamal@yazd.ac.ir} \\
+\end{tabularx}
+
+\begin{tabularx}{\linewidth}{ @{}l X@{} }
+\href{https://yazd.ac.ir/people/e.abbasi/}{\textbf{\color{black}Dr. Elham Abbasi}}\\
+\hspace{0.9cm}Assistant Professor of Computer Science Department, Yazd University, Yazd, Iran \\
+\hspace{0.9cm}Email Address: \href{mailto:e.abbasi@yazd.ac.ir@yazd.ac.ir}{e.abbasi@yazd.ac.ir} \\
+\end{tabularx}
+
+
+%----------------------------------------------------------------------------------------
+%	PUBLICATIONS
+%----------------------------------------------------------------------------------------
+%\section{Publications}
+%\begin{refsection}[citations.bib]
+%\nocite{*}
+%\printbibliography[heading=none]
+%\end{refsection}
+
+
+%\vfill
+%\center{\footnotesize Last updated: \today}
+
+\end{document}
