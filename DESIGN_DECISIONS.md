@@ -3,17 +3,129 @@
 The site ships in two versions side by side. Both reach the same content;
 they differ in register.
 
-- **v2** at `/` &mdash; the quiet, minimal, light-default page. This is the
-  default landing. Most recruiters and visitors will only ever see this.
-- **v3** at `/v3/` &mdash; an interactive 3D scene built with Three.js.
-  Reached from the small "spatial" pill in v2's top bar. v3 also offers a
-  "switch to flat" link back to v2 in its top corner.
+- **Main** at `/` &mdash; a premium light editorial design. This is the
+  default landing.
+- **Spatial** at `/v3/` &mdash; an interactive 3D scene built with Three.js.
+  Reached from the small "spatial" pill in the main top bar. The spatial
+  version offers a "switch to flat" link back at any time.
 
-The v2 rationale is below. The v3 rationale follows further down.
+The history (v1 &rarr; v2 &rarr; main) is documented below because the
+trail of failed attempts explains some choices in the current one.
 
 ---
 
-# v2 &mdash; quiet minimal
+# Main &mdash; premium light, magazine editorial
+
+After v2 ("quiet minimal Swiss/Italian") shipped, the user pushed back:
+*too plain &mdash; needs more visual interest / premium feel*. This redesign
+takes the same content and reframes it as a fashion-house personal site:
+a single typographic statement, generous whitespace, magazine pacing.
+
+## Brief
+
+- Keep the v2 content (About, Now, Work, Projects, Contact).
+- Premium light cream/off-white, but with more typographic drama than v2.
+- Bigger display serif (Cormorant), more whitespace, asymmetric layout.
+- Should feel like a fashion-house personal site rather than a blog.
+- A photo placeholder slot &mdash; the user will provide a new image.
+
+## Direction
+
+A magazine cover with a personal essay attached. Two faces:
+
+- **Cormorant** (italic-leaning) handles every display moment &mdash; the
+  hero name, section titles ("Who I am.", "Where I've been."), pull
+  quotes, repo names, key labels in `Now` and `Contact`. The italic
+  is doing real narrative work, not just decorating.
+- **Inter Tight** handles body, navigation chrome, and the family name
+  ("Alehosseini") which is set in light-weight sans against the serif
+  given name &mdash; the contrast is the design.
+
+## Palette
+
+No chromatic accent. Drama lives in scale, weight, and italic.
+
+| Token | Light | Dark |
+|---|---|---|
+| `--paper` | `#F7F3EA` &mdash; warm cream paper | `#15151A` &mdash; espresso |
+| `--paper-2` | `#FBF8F0` | `#1B1B22` |
+| `--paper-3` | `#FFFFFF` &mdash; pure white (used sparingly) | `#22222A` |
+| `--ink` | `#18181B` &mdash; deep ink | `#F4EFE3` &mdash; cream text |
+| `--ink-soft` | `#3F3F46` | `#D2CDC0` |
+| `--muted` | `#76716A` &mdash; warm gray | `#8A8580` |
+| `--rule` | `#DDD7C8` | `#2C2C33` |
+
+A subtle SVG turbulence noise sits over everything at 2.5% opacity for
+paper texture &mdash; just enough to feel printed.
+
+## Typography moves worth keeping
+
+- **Drop cap** on the About lede. Cormorant italic, 3.2em, floated. Very
+  printed-book.
+- **Family name in light sans** beneath the italic given name in the
+  hero. The contrast (italic-serif vs. light-sans, large vs. medium)
+  is the page's strongest typographic moment.
+- **Section titles** built as a phrase with one italicized verb:
+  "*Who* I am.", "*Where* I've been.", "*What* I've built.". The
+  italic carries the personality.
+- **Repo names** set in italic serif, 1.45rem &mdash; a real upgrade from
+  the sans-serif treatment in v2.
+- **Eyebrow labels** in Inter Tight uppercase 0.74rem with section
+  numbers (§ 01, § 02, ...). Quiet running headers like in print.
+
+## Hero layout
+
+Two-column at desktop, stacked on mobile. Text column on the left, photo
+on the right. Photo is framed with a soft drop shadow and a caption
+beneath ("Genova, 2026" with a "N° 01" plate number to the right) &mdash; the
+caption is the page's most editorial gesture.
+
+The current photo is the wooden-bench portrait from v2. The user is
+sending a replacement; the slot dimensions (4:5 portrait, 800&times;1000)
+and surrounding chrome stay the same, so swapping is a one-file drop-in.
+
+## Sections
+
+1. **Hero** &mdash; portrait + name + role + location/availability.
+2. **About** &mdash; four paragraphs, drop-cap lede, pull quote in italic.
+3. **Now** &mdash; dated key/value list (Thesis, Reading, Building,
+   Learning, Looking for). Keys in italic serif.
+4. **Work** &mdash; numbered timeline (01-05) with italic serif numerals,
+   year + title + place + short blurb per entry.
+5. **Projects** &mdash; live-fetched from GitHub, repo names in italic
+   serif, language and year on the right.
+6. **Contact** &mdash; key/value list. Email, LinkedIn, GitHub, CV PDF,
+   plus a "Spatial" row linking to v3.
+7. **Currently** &mdash; one italic Cormorant line, center-aligned, on a
+   dashed rule above the footer.
+8. **Footer** &mdash; brand + year on the left, source link + trilingual
+   indicator (English, &#1601;&#1575;&#1585;&#1587;&#1740;, Italiano A1)
+   on the right.
+
+## What this version inherits
+
+- The theme toggle from v2 (light default, dark mirror, stored in
+  localStorage, set inline before paint to avoid a flash).
+- The `background-color` set on `html` rather than `body` &mdash; a Chrome
+  CSS-variable repaint quirk on attribute changes that bit me in v2.
+- The live GitHub fetch and its hardcoded fallback.
+- The cross-link to `/v3/`.
+
+## What this version is NOT
+
+- Loud. No gradients, no animation beyond the theme transition and a
+  subtle photo zoom on hover.
+- Trying to be a SaaS landing page. The conversion is "read the
+  essay," not "click the CTA."
+- A direct mirror of v3. They share content, not visual language.
+
+---
+
+# v2 &mdash; quiet minimal (superseded)
+
+(Kept for context. The main page above replaced this version on
+2026-05-22 after the user asked for more typographic drama.)
+
 
 The first attempt (dark ink, amber accent, "engineering editorial") missed
 badly. It led with the Riggosaurus 100-GPU number, used a black-and-gold

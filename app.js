@@ -143,10 +143,10 @@
       const picked = pick(data);
       if (!picked.length) throw new Error("no public repos");
       render(picked);
-      if (metaEl) metaEl.textContent = `live, ${picked.length} repos`;
+      if (metaEl) metaEl.textContent = `· live, ${picked.length} repos`;
     } catch (e) {
       render(FALLBACK);
-      if (metaEl) metaEl.textContent = "cached selection";
+      if (metaEl) metaEl.textContent = "· cached selection";
     }
   }
 

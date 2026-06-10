@@ -5,265 +5,313 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mojtaba Alehosseini</title>
 
-  <meta name="description" content="M.Sc. AI student at the University of Genova. Working through LLMs, computer vision, and the gap from model to product." />
+  <meta name="description" content="M.Sc. AI student at the University of Genova. Currently working through LLMs, computer vision, and the gap from model to product." />
   <meta name="author" content="Mojtaba Alehosseini" />
-  <meta name="theme-color" content="#F8F5EE" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#F7F3EA" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#15151A" media="(prefers-color-scheme: dark)" />
 
   <meta property="og:title" content="Mojtaba Alehosseini" />
-  <meta property="og:description" content="M.Sc. AI student in Genova. Currently working through LLMs, computer vision, and the gap from model to product." />
+  <meta property="og:description" content="M.Sc. AI student in Genova. Working through LLMs, computer vision, and the gap from model to product." />
   <meta property="og:url" content="https://mojtaba-alehosseini.github.io/" />
   <meta property="og:type" content="website" />
 
   <link rel="canonical" href="https://mojtaba-alehosseini.github.io/" />
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23F8F5EE'/%3E%3Ctext x='50%25' y='52%25' dominant-baseline='central' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,sans-serif' font-size='17' font-weight='600' fill='%231A1A1A'%3Em%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23F7F3EA'/%3E%3Ctext x='50%25' y='58%25' dominant-baseline='central' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='22' font-weight='400' fill='%2318181B'%3EM%3C/text%3E%3C/svg%3E" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
-  <!-- Set theme before paint to avoid a flash. -->
   <script>
     (function() {
       try {
-        var saved = localStorage.getItem('theme');
-        if (saved === 'dark' || saved === 'light') {
-          document.documentElement.dataset.theme = saved;
-        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          document.documentElement.dataset.theme = 'dark';
-        } else {
-          document.documentElement.dataset.theme = 'light';
-        }
-      } catch (e) {
-        document.documentElement.dataset.theme = 'light';
-      }
+        var s = localStorage.getItem('theme');
+        if (s === 'dark' || s === 'light') document.documentElement.dataset.theme = s;
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.dataset.theme = 'dark';
+        else document.documentElement.dataset.theme = 'light';
+      } catch (e) { document.documentElement.dataset.theme = 'light'; }
     })();
   </script>
 
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+
   <a class="skip" href="#main">Skip to content</a>
 
-  <header class="topbar">
-    <div class="topbar__inner">
-      <a class="brand" href="/">Mojtaba Alehosseini</a>
-      <nav class="nav" aria-label="Sections">
-        <a href="#about">about</a>
-        <span class="dot" aria-hidden="true">&middot;</span>
-        <a href="#now">now</a>
-        <span class="dot" aria-hidden="true">&middot;</span>
-        <a href="#work">work</a>
-        <span class="dot" aria-hidden="true">&middot;</span>
-        <a href="#projects">projects</a>
-        <span class="dot" aria-hidden="true">&middot;</span>
-        <a href="#contact">contact</a>
-      </nav>
-      <a class="v3link" href="v3/" aria-label="Switch to spatial version">
-        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-          <path d="M12 2 L22 7 L22 17 L12 22 L2 17 L2 7 Z M12 2 L12 22 M2 7 L22 17 M22 7 L2 17" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
-        </svg>
-        <span>spatial</span>
+  <!-- Sticky top bar -->
+  <header class="top">
+    <div class="top__inner">
+      <a class="top__brand" href="/" aria-label="Mojtaba Alehosseini, home">
+        <span class="top__monogram" aria-hidden="true">M<em>A</em></span>
+        <span class="top__name">Mojtaba Alehosseini</span>
       </a>
-      <button class="toggle" type="button" aria-label="Switch theme" data-toggle>
-        <svg class="toggle__sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-          <circle cx="12" cy="12" r="4" fill="currentColor"/>
-          <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-            <path d="M12 3v2"/><path d="M12 19v2"/>
-            <path d="M3 12h2"/><path d="M19 12h2"/>
-            <path d="M5.6 5.6l1.4 1.4"/><path d="M17 17l1.4 1.4"/>
-            <path d="M5.6 18.4L7 17"/><path d="M17 7l1.4-1.4"/>
-          </g>
-        </svg>
-        <svg class="toggle__moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-          <path fill="currentColor" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>
-        </svg>
-      </button>
+      <nav class="top__nav" aria-label="Sections">
+        <a href="#about">About</a>
+        <a href="#now">Now</a>
+        <a href="#work">Work</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="top__right">
+        <a class="top__spatial" href="v3/" aria-label="Switch to spatial version">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+            <path d="M12 2 L22 7 L22 17 L12 22 L2 17 L2 7 Z M12 2 L12 22 M2 7 L22 17 M22 7 L2 17" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+          </svg>
+          <span>Spatial</span>
+        </a>
+        <button class="top__toggle" type="button" aria-label="Switch theme" data-toggle>
+          <svg class="top__sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" fill="currentColor"/>
+            <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+              <path d="M12 3v2"/><path d="M12 19v2"/>
+              <path d="M3 12h2"/><path d="M19 12h2"/>
+              <path d="M5.6 5.6l1.4 1.4"/><path d="M17 17l1.4 1.4"/>
+              <path d="M5.6 18.4L7 17"/><path d="M17 7l1.4-1.4"/>
+            </g>
+          </svg>
+          <svg class="top__moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+            <path fill="currentColor" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
   <main id="main">
 
+    <!-- ── HERO ───────────────────────────────────────────────── -->
     <section class="hero">
-      <figure class="hero__photo">
-        <img src="photo.jpg" alt="Portrait of Mojtaba Alehosseini" width="800" height="1000" />
-      </figure>
-      <div class="hero__text">
-        <h1>Hi, I'm Mojtaba.</h1>
-        <p class="hero__tag">
-          M.Sc. AI student at the University of Genova. Working through LLMs,
-          computer vision, and the gap from model to product.
+      <div class="hero__col hero__col--text">
+        <p class="hero__eyebrow"><em>Hi</em> &mdash; nice to meet you.</p>
+        <h1 class="hero__name">
+          <span class="hero__given"><em>Mojtaba</em></span>
+          <span class="hero__family">Alehosseini</span>
+        </h1>
+        <p class="hero__role">
+          M.Sc. AI student at the University of Genova. Currently working through
+          LLMs, computer vision, and the gap from model to product.
         </p>
         <p class="hero__loc">
-          <span>Genova, Italy</span>
-          <span class="dim" aria-hidden="true">&middot;</span>
-          <span>Open to AI/ML roles in the EU, 2026/2027</span>
+          <span>Genova, Liguria, Italy</span>
+          <span class="dot" aria-hidden="true">&middot;</span>
+          <span>Open to AI/ML roles in the EU &mdash; 2026/2027</span>
+        </p>
+      </div>
+
+      <div class="hero__col hero__col--photo">
+        <figure class="portrait">
+          <div class="portrait__frame">
+            <img src="photo.jpg" alt="Portrait of Mojtaba Alehosseini" width="800" height="1000" loading="eager" />
+          </div>
+          <figcaption class="portrait__caption">
+            <em>Genova, 2026</em>
+            <span class="portrait__caption-num">N&deg; 01</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ── ABOUT ──────────────────────────────────────────────── -->
+    <section id="about" class="block">
+      <p class="block__label">&sect; 01 &middot; About</p>
+      <h2 class="block__title"><em>Who</em> I am.</h2>
+
+      <div class="prose">
+        <p class="lede">
+          I grew up in Iran and studied computer science at Yazd University.
+          I'm now finishing an M.Sc. in Computer Science with an AI track at
+          the University of Genova, in Italy.
+        </p>
+
+        <p>
+          Before Italy, I spent two years as a Business Technology Analyst at
+          Setare Talaee Co., shipping Power BI dashboards across sales,
+          finance, and supply chain. The piece I'm proudest of from that time:
+          cutting routine reporting time by about a quarter, mostly by
+          rebuilding the data layer underneath the dashboards so people could
+          trust the numbers without checking them by hand.
+        </p>
+
+        <p>
+          Outside the M.Sc., between 2020 and 2025 I co-built and ran a small
+          GPU compute setup with two partners. It taught me how to think about
+          physical systems and their cost, which turns out to be useful for ML
+          too.
+        </p>
+
+        <blockquote class="quote">
+          <p><em>&ldquo;I tend to think about a model in terms of the dashboard it has to show up on, not just the curve on a validation set.&rdquo;</em></p>
+        </blockquote>
+
+        <p>
+          I'm using the Master's at Genova to move into AI/ML properly &mdash;
+          currently exploring LLMs and retrieval-augmented systems, classical
+          ML, and computer vision through coursework and my thesis.
         </p>
       </div>
     </section>
 
-    <section id="about" class="block">
-      <h2>About</h2>
-      <p>
-        I grew up in Iran and studied computer science at Yazd University,
-        then started a Master's at Shahid Beheshti in Tehran before moving
-        to Italy. I'm now finishing an M.Sc. in Computer Science with an
-        AI track at the University of Genova.
-      </p>
-      <p>
-        Before Italy I spent two years as a Business Technology Analyst at
-        Setare Talaee Co., building Power BI dashboards across sales,
-        finance, and supply chain. The work I'm proudest of from that time
-        was cutting routine reporting time by about a quarter, mostly by
-        rebuilding the data layer underneath the dashboards so people
-        could trust the numbers without checking them by hand.
-      </p>
-      <p>
-        Outside the M.Sc., between 2020 and 2025 I co-built and ran a
-        small GPU compute setup with two partners — twenty-something rigs,
-        a handful of operating systems, a lot of late-night hardware
-        fiddling. It taught me how to think about physical systems and
-        their cost, which turns out to be useful for ML too.
-      </p>
-      <p>
-        I'm using the Master's at Genova to move into AI/ML properly.
-        Coming from BI, I tend to think about a model in terms of the
-        dashboard it has to show up on, not just the curve on a validation
-        set.
-      </p>
-    </section>
-
+    <!-- ── NOW ────────────────────────────────────────────────── -->
     <section id="now" class="block">
-      <h2>Now <span class="dim">&middot; <time datetime="2026-05">May 2026</time></span></h2>
-      <ul class="now">
-        <li>
-          <span class="now__key">Thesis</span>
-          <span class="now__val">applied machine learning, exploring topic-of-the-month while it lasts.</span>
-        </li>
-        <li>
-          <span class="now__key">Reading</span>
-          <span class="now__val">Bishop, <em>Pattern Recognition and Machine Learning</em>. Karpathy's <em>makemore</em> walkthroughs on the side.</span>
-        </li>
-        <li>
-          <span class="now__key">Building</span>
-          <span class="now__val">small RAG and CV side projects to see where my intuition breaks.</span>
-        </li>
-        <li>
-          <span class="now__key">Learning</span>
-          <span class="now__val">Italian. Currently A1, slowly fighting toward B1.</span>
-        </li>
-        <li>
-          <span class="now__key">Looking for</span>
-          <span class="now__val">AI/ML internships or graduate roles in the EU starting 2026/2027. Sponsorship welcome.</span>
-        </li>
-      </ul>
+      <p class="block__label">&sect; 02 &middot; Now</p>
+      <h2 class="block__title"><em>What</em> I'm working on.</h2>
+      <p class="block__date"><time datetime="2026-05">May 2026</time></p>
+
+      <dl class="now">
+        <div class="now__row">
+          <dt><em>Thesis</em></dt>
+          <dd>applied machine learning, exploring topic-of-the-month while it lasts.</dd>
+        </div>
+        <div class="now__row">
+          <dt><em>Reading</em></dt>
+          <dd>Bishop, <em>Pattern Recognition and Machine Learning</em>. Karpathy's <em>makemore</em> walkthroughs on the side.</dd>
+        </div>
+        <div class="now__row">
+          <dt><em>Building</em></dt>
+          <dd>small RAG and CV side projects to see where my intuition breaks.</dd>
+        </div>
+        <div class="now__row">
+          <dt><em>Learning</em></dt>
+          <dd>Italian. Currently A1, slowly fighting toward B1.</dd>
+        </div>
+        <div class="now__row">
+          <dt><em>Looking for</em></dt>
+          <dd>AI/ML internships or graduate roles in the EU starting 2026/2027. Sponsorship welcome.</dd>
+        </div>
+      </dl>
     </section>
 
+    <!-- ── WORK ───────────────────────────────────────────────── -->
     <section id="work" class="block">
-      <h2>Work</h2>
+      <p class="block__label">&sect; 03 &middot; Work</p>
+      <h2 class="block__title"><em>Where</em> I've been.</h2>
+
       <ol class="timeline">
-
-        <li>
-          <span class="timeline__when">2024 &mdash; present</span>
-          <h3 class="timeline__what">M.Sc. Computer Science, AI track</h3>
-          <span class="timeline__where">University of Genova, Italy</span>
-          <p>Coursework across machine learning, computer vision, and motion analysis. Thesis territory: applied ML.</p>
+        <li class="timeline__row">
+          <span class="timeline__no"><em>01</em></span>
+          <div class="timeline__main">
+            <p class="timeline__when">2024 &mdash; present</p>
+            <h3 class="timeline__title">M.Sc. Computer Science <em>(AI track)</em></h3>
+            <p class="timeline__where">University of Genova, Italy</p>
+            <p>Coursework across machine learning, computer vision, and motion analysis. Thesis territory: applied ML.</p>
+          </div>
         </li>
-
-        <li>
-          <span class="timeline__when">2023 &mdash; 2025</span>
-          <h3 class="timeline__what">Business Technology Analyst</h3>
-          <span class="timeline__where">Setare Talaee Co., Delijan, Iran</span>
-          <p>
-            Built and shipped Power BI dashboards across sales, finance, and supply chain.
-            Cut routine reporting time by about 25% by rebuilding the SQL and Power Query
-            pipelines underneath the dashboards. Trained non-technical staff to self-serve,
-            which is when the dashboards started actually paying for themselves.
-          </p>
+        <li class="timeline__row">
+          <span class="timeline__no"><em>02</em></span>
+          <div class="timeline__main">
+            <p class="timeline__when">2023 &mdash; 2025</p>
+            <h3 class="timeline__title">Business Technology Analyst</h3>
+            <p class="timeline__where">Setare Talaee Co., Delijan, Iran</p>
+            <p>Built Power BI dashboards across sales, finance, and supply chain. Cut routine reporting time by about 25% by rebuilding the SQL and Power Query pipelines underneath. Trained non-technical staff to self-serve, which is when the dashboards started actually paying for themselves.</p>
+          </div>
         </li>
-
-        <li>
-          <span class="timeline__when">2020 &mdash; 2025</span>
-          <h3 class="timeline__what">Co-founder, Riggosaurus</h3>
-          <span class="timeline__where">Self-founded, Iran (remote ops)</span>
-          <p>
-            Co-built and ran a small distributed GPU compute setup with two partners
-            &mdash; twenty-plus rigs across six operating systems, with remote monitoring
-            and per-card tuning. Closed down after Ethereum's Proof-of-Stake transition.
-            It taught me what physical compute infrastructure actually costs to operate.
-          </p>
+        <li class="timeline__row">
+          <span class="timeline__no"><em>03</em></span>
+          <div class="timeline__main">
+            <p class="timeline__when">2020 &mdash; 2025</p>
+            <h3 class="timeline__title">Co-founder, <em>Riggosaurus</em></h3>
+            <p class="timeline__where">Self-founded, Iran (remote ops)</p>
+            <p>Co-built and ran a small distributed GPU compute setup with two partners. Closed down after Ethereum's Proof-of-Stake transition. Taught me what physical compute infrastructure actually costs to operate.</p>
+          </div>
         </li>
-
-        <li>
-          <span class="timeline__when">2018 &mdash; 2020</span>
-          <h3 class="timeline__what">Co-founder &amp; Software Developer, Pinfopedia</h3>
-          <span class="timeline__where">Iran</span>
-          <p>
-            Co-founded a Persian-language product encyclopedia. Built the platform with
-            Flask and a relational database. Designed PinfoTags &mdash; QR-coded labels that
-            linked a physical product to its digital page. Async layer in Celery + RabbitMQ
-            for image processing and content ingestion.
-          </p>
+        <li class="timeline__row">
+          <span class="timeline__no"><em>04</em></span>
+          <div class="timeline__main">
+            <p class="timeline__when">2018 &mdash; 2020</p>
+            <h3 class="timeline__title">Co-founder &amp; Software Developer, <em>Pinfopedia</em></h3>
+            <p class="timeline__where">Iran</p>
+            <p>Co-founded a Persian-language product encyclopedia. Built the platform with Flask. Designed PinfoTags &mdash; QR-coded labels linking physical products to their digital pages. Async layer in Celery + RabbitMQ for image processing.</p>
+          </div>
         </li>
-
-        <li>
-          <span class="timeline__when">2018 &mdash; 2020</span>
-          <h3 class="timeline__what">Secretary, CS Scientific Association</h3>
-          <span class="timeline__where">Yazd University, Iran</span>
-          <p>
-            Ran programming contests, hackathons, and workshops. Helped the association
-            reach 2nd place in the university-wide ranking during my tenure.
-          </p>
+        <li class="timeline__row">
+          <span class="timeline__no"><em>05</em></span>
+          <div class="timeline__main">
+            <p class="timeline__when">2018 &mdash; 2020</p>
+            <h3 class="timeline__title">Secretary, CS Scientific Association</h3>
+            <p class="timeline__where">Yazd University, Iran</p>
+            <p>Ran programming contests, hackathons, and workshops. The association reached 2nd place in the university-wide ranking during my tenure.</p>
+          </div>
         </li>
-
       </ol>
     </section>
 
+    <!-- ── PROJECTS ────────────────────────────────────────────── -->
     <section id="projects" class="block">
-      <h2>Projects <span class="dim">&middot; <span id="repo-meta">loading from GitHub</span></span></h2>
-      <p class="block__lede">
-        Pulled live from GitHub. Forks and this repo itself are filtered out.
-        Most of the recent activity is coursework from Genova, with older
-        deep-learning and NLP work below.
+      <p class="block__label">&sect; 04 &middot; Projects <span class="block__label-sub" id="repo-meta">&middot; loading from GitHub</span></p>
+      <!-- repo-meta is populated by app.js; default text shown before fetch -->
+
+      <h2 class="block__title"><em>What</em> I've built.</h2>
+
+      <p class="block__intro">
+        Pulled live from GitHub. Forks and this site's source are filtered out.
+        Most of the recent activity is coursework from Genova; the older entries
+        are NLP and deep-learning work from Shahid Beheshti.
       </p>
+
       <ol id="repo-list" class="repos" aria-label="Selected repositories"></ol>
+
       <p class="block__foot">
         <a class="link" href="https://github.com/Mojtaba-Alehosseini?tab=repositories" rel="noopener">
-          all repositories on GitHub &rarr;
+          All repositories on GitHub <span aria-hidden="true">&rarr;</span>
         </a>
       </p>
     </section>
 
+    <!-- ── CONTACT ─────────────────────────────────────────────── -->
     <section id="contact" class="block">
-      <h2>Contact</h2>
-      <p>
-        Happy to talk to anyone working on applied AI, ML infrastructure,
-        or data products &mdash; especially in Italy, Denmark, or any
+      <p class="block__label">&sect; 05 &middot; Contact</p>
+      <h2 class="block__title"><em>Get</em> in touch.</h2>
+
+      <p class="contact__lede">
+        Happy to talk to anyone working on applied AI, ML infrastructure, or
+        data products &mdash; especially in Italy, Denmark, or any
         remote-friendly EU team.
       </p>
-      <ul class="contact">
-        <li><span class="contact__key">Email</span><a class="link" href="mailto:alehoseini.mojtaba@gmail.com">alehoseini.mojtaba@gmail.com</a></li>
-        <li><span class="contact__key">LinkedIn</span><a class="link" href="https://www.linkedin.com/in/mojtaba-alehosseini/" rel="noopener">linkedin.com/in/mojtaba-alehosseini</a></li>
-        <li><span class="contact__key">GitHub</span><a class="link" href="https://github.com/Mojtaba-Alehosseini" rel="noopener">github.com/Mojtaba-Alehosseini</a></li>
-        <li><span class="contact__key">CV</span><a class="link" href="CV/Mojtaba%20Alehosseini%20CV.pdf">PDF, current version</a></li>
-      </ul>
+
+      <dl class="contact">
+        <div class="contact__row">
+          <dt><em>Email</em></dt>
+          <dd><a class="link" href="mailto:alehoseini.mojtaba@gmail.com">alehoseini.mojtaba@gmail.com</a></dd>
+        </div>
+        <div class="contact__row">
+          <dt><em>LinkedIn</em></dt>
+          <dd><a class="link" href="https://www.linkedin.com/in/mojtaba-alehosseini/" rel="noopener">linkedin.com/in/mojtaba-alehosseini</a></dd>
+        </div>
+        <div class="contact__row">
+          <dt><em>GitHub</em></dt>
+          <dd><a class="link" href="https://github.com/Mojtaba-Alehosseini" rel="noopener">github.com/Mojtaba-Alehosseini</a></dd>
+        </div>
+        <div class="contact__row">
+          <dt><em>CV</em></dt>
+          <dd><a class="link" href="CV/Mojtaba%20Alehosseini%20CV.pdf">PDF, current version</a></dd>
+        </div>
+        <div class="contact__row">
+          <dt><em>Spatial</em></dt>
+          <dd><a class="link" href="v3/">an interactive 3D version of this page</a></dd>
+        </div>
+      </dl>
     </section>
 
-    <p class="currently" aria-label="Personal status">
-      <em>currently: somewhere in Genova, fixing one more bug before the espresso wears off.</em>
+    <!-- ── CURRENTLY (personal flavor) ─────────────────────────── -->
+    <p class="currently">
+      <em>Currently &mdash; somewhere in Genova, fixing one more bug before the espresso wears off.</em>
     </p>
 
   </main>
 
   <footer class="foot">
     <div class="foot__inner">
-      <span>Mojtaba Alehosseini</span>
-      <span class="dim" aria-hidden="true">&middot;</span>
-      <span>Genova, Italy</span>
-      <span class="dim" aria-hidden="true">&middot;</span>
-      <span><span class="foot__year"></span></span>
-      <span class="dim" aria-hidden="true">&middot;</span>
-      <span>built by hand &mdash; <a class="link link--quiet" href="https://github.com/Mojtaba-Alehosseini/Mojtaba-Alehosseini.github.io" rel="noopener">source</a></span>
+      <div class="foot__col">
+        <p class="foot__brand"><em>Mojtaba Alehosseini</em></p>
+        <p class="foot__line">Genova, Italy &mdash; <span class="foot__year"></span></p>
+      </div>
+      <div class="foot__col foot__col--right">
+        <p class="foot__line">Built by hand. <a class="link link--quiet" href="https://github.com/Mojtaba-Alehosseini/Mojtaba-Alehosseini.github.io" rel="noopener">View source</a>.</p>
+        <p class="foot__line foot__lang">
+          <span>English</span><span class="dot">&middot;</span><span lang="fa">فارسی</span><span class="dot">&middot;</span><span>Italiano <em>(A1)</em></span>
+        </p>
+      </div>
     </div>
   </footer>
 
