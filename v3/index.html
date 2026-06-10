@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Mojtaba Alehosseini &mdash; spatial</title>
+  <meta name="description" content="An interactive 3D portfolio for Mojtaba Alehosseini, M.Sc. AI student at the University of Genova." />
+  <meta name="theme-color" content="#08081A" />
+  <link rel="canonical" href="https://mojtaba-alehosseini.github.io/v3/" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2308081A'/%3E%3Ctext x='50%25' y='52%25' dominant-baseline='central' text-anchor='middle' font-family='-apple-system,sans-serif' font-size='17' font-weight='600' fill='%23F5F5FA'%3Em%3C/text%3E%3C/svg%3E" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Loading screen, removed by JS when scene is ready -->
+  <div id="loader" class="loader" aria-live="polite">
+    <div class="loader__inner">
+      <div class="loader__brand">Mojtaba Alehosseini</div>
+      <div class="loader__hint">loading the room&hellip;</div>
+      <div class="loader__bar"><div class="loader__bar-fill" id="loader-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- WebGL canvas mount -->
+  <canvas id="scene" aria-label="3D portfolio scene"></canvas>
+
+  <!-- Persistent top corner UI -->
+  <header class="top">
+    <a class="top__brand" href="../">
+      <span class="dot" aria-hidden="true"></span>
+      <span>Mojtaba Alehosseini</span>
+    </a>
+    <div class="top__right">
+      <a class="top__link" href="../">switch to flat &rarr;</a>
+    </div>
+  </header>
+
+  <!-- Floating instruction hint, fades out after first interaction -->
+  <div id="hint" class="hint">
+    <span class="hint__line">drag to look &middot; click a sphere to read</span>
+  </div>
+
+  <!-- Section content overlays, opened on click -->
+  <aside class="panel" id="panel" aria-hidden="true">
+    <button class="panel__close" type="button" id="panel-close" aria-label="Close panel">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M6 6L18 18M6 18L18 6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <div class="panel__inner">
+
+      <!-- ABOUT -->
+      <section class="panel__section" data-section="about">
+        <p class="panel__eyebrow">01 &middot; about</p>
+        <h2 class="panel__h2">Hi, I'm Mojtaba.</h2>
+        <p>
+          I grew up in Iran and studied computer science at Yazd University.
+          I'm now finishing an M.Sc. in Computer Science with an AI track at
+          the University of Genova.
+        </p>
+        <p>
+          Before Italy I spent two years as a Business Technology Analyst at
+          Setare Talaee Co., building Power BI dashboards across sales,
+          finance, and supply chain. The piece I'm proudest of from that time:
+          cutting routine reporting time by about a quarter by rebuilding the
+          data layer so people could trust the numbers without checking them
+          by hand.
+        </p>
+        <p>
+          Outside the M.Sc., between 2020 and 2025 I co-built and ran a small
+          GPU compute setup with two partners. It taught me how to think about
+          physical systems and their cost.
+        </p>
+        <p class="panel__quote">
+          I'm using the Master's at Genova to move into AI/ML properly. Coming
+          from BI, I tend to think about a model in terms of the dashboard
+          it has to show up on, not just the curve on a validation set.
+        </p>
+      </section>
+
+      <!-- NOW -->
+      <section class="panel__section" data-section="now">
+        <p class="panel__eyebrow">02 &middot; now <span class="dim">&middot; <time datetime="2026-05">May 2026</time></span></p>
+        <h2 class="panel__h2">Currently</h2>
+        <ul class="kv">
+          <li><span>Thesis</span><span>applied machine learning, exploring topic-of-the-month while it lasts.</span></li>
+          <li><span>Reading</span><span>Bishop, <em>Pattern Recognition and Machine Learning</em>. Karpathy's <em>makemore</em> walkthroughs on the side.</span></li>
+          <li><span>Building</span><span>small RAG and CV side projects to see where my intuition breaks.</span></li>
+          <li><span>Learning</span><span>Italian. Currently A1, slowly fighting toward B1.</span></li>
+          <li><span>Looking for</span><span>AI/ML internships or graduate roles in the EU starting 2026/2027. Sponsorship welcome.</span></li>
+        </ul>
+      </section>
+
+      <!-- WORK -->
+      <section class="panel__section" data-section="work">
+        <p class="panel__eyebrow">03 &middot; work</p>
+        <h2 class="panel__h2">Experience</h2>
+        <ol class="timeline">
+          <li>
+            <span class="timeline__when">2024 &mdash; present</span>
+            <h3>M.Sc. Computer Science, AI track</h3>
+            <span class="timeline__where">University of Genova, Italy</span>
+            <p>Coursework across machine learning, computer vision, and motion analysis. Thesis territory: applied ML.</p>
+          </li>
+          <li>
+            <span class="timeline__when">2023 &mdash; 2025</span>
+            <h3>Business Technology Analyst</h3>
+            <span class="timeline__where">Setare Talaee Co., Delijan, Iran</span>
+            <p>Power BI dashboards across sales, finance, and supply chain. Cut routine reporting time by about 25% by rebuilding the SQL and Power Query pipelines underneath the dashboards.</p>
+          </li>
+          <li>
+            <span class="timeline__when">2020 &mdash; 2025</span>
+            <h3>Co-founder, Riggosaurus</h3>
+            <span class="timeline__where">Self-founded, Iran (remote ops)</span>
+            <p>Co-built and ran a small distributed GPU compute setup with two partners. Closed down after Ethereum's Proof-of-Stake transition.</p>
+          </li>
+          <li>
+            <span class="timeline__when">2018 &mdash; 2020</span>
+            <h3>Co-founder &amp; Software Developer, Pinfopedia</h3>
+            <span class="timeline__where">Iran</span>
+            <p>Co-founded a Persian-language product encyclopedia. Built the platform with Flask, async layer in Celery + RabbitMQ for image processing and content ingestion.</p>
+          </li>
+          <li>
+            <span class="timeline__when">2018 &mdash; 2020</span>
+            <h3>Secretary, CS Scientific Association</h3>
+            <span class="timeline__where">Yazd University, Iran</span>
+            <p>Ran programming contests, hackathons, and workshops.</p>
+          </li>
+        </ol>
+      </section>
+
+      <!-- PROJECTS -->
+      <section class="panel__section" data-section="projects">
+        <p class="panel__eyebrow">04 &middot; projects <span class="dim">&middot; <span id="repo-meta">loading from GitHub</span></span></p>
+        <h2 class="panel__h2">Selected work</h2>
+        <p class="dim">
+          Pulled live from GitHub. Forks and this site's source are filtered out.
+        </p>
+        <ol id="repo-list" class="repos" aria-label="Selected repositories"></ol>
+        <p class="panel__foot">
+          <a class="link" href="https://github.com/Mojtaba-Alehosseini?tab=repositories" target="_blank" rel="noopener">
+            all repositories on GitHub &rarr;
+          </a>
+        </p>
+      </section>
+
+      <!-- CONTACT -->
+      <section class="panel__section" data-section="contact">
+        <p class="panel__eyebrow">05 &middot; contact</p>
+        <h2 class="panel__h2">Get in touch</h2>
+        <p>
+          Happy to talk to anyone working on applied AI, ML infrastructure,
+          or data products. Especially in Italy, Denmark, or any
+          remote-friendly EU team.
+        </p>
+        <ul class="contact">
+          <li><span>Email</span><a class="link" href="mailto:alehoseini.mojtaba@gmail.com">alehoseini.mojtaba@gmail.com</a></li>
+          <li><span>LinkedIn</span><a class="link" href="https://www.linkedin.com/in/mojtaba-alehosseini/" target="_blank" rel="noopener">linkedin.com/in/mojtaba-alehosseini</a></li>
+          <li><span>GitHub</span><a class="link" href="https://github.com/Mojtaba-Alehosseini" target="_blank" rel="noopener">github.com/Mojtaba-Alehosseini</a></li>
+          <li><span>CV</span><a class="link" href="../CV/Mojtaba%20Alehosseini%20CV.pdf" target="_blank" rel="noopener">PDF, current version</a></li>
+        </ul>
+        <p class="panel__sig">
+          <em>Genova, Italy &middot; open to AI/ML roles in the EU, 2026/2027.</em>
+        </p>
+      </section>
+
+    </div>
+  </aside>
+
+  <!-- WebGL not supported message -->
+  <noscript>
+    <div class="oops">
+      <p>This experience needs JavaScript and WebGL. Try the <a href="../">flat version</a>.</p>
+    </div>
+  </noscript>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

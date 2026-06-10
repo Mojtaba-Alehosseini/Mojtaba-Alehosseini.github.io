@@ -1,4 +1,19 @@
-# Design decisions &mdash; v2
+# Design decisions
+
+The site ships in two versions side by side. Both reach the same content;
+they differ in register.
+
+- **v2** at `/` &mdash; the quiet, minimal, light-default page. This is the
+  default landing. Most recruiters and visitors will only ever see this.
+- **v3** at `/v3/` &mdash; an interactive 3D scene built with Three.js.
+  Reached from the small "spatial" pill in v2's top bar. v3 also offers a
+  "switch to flat" link back to v2 in its top corner.
+
+The v2 rationale is below. The v3 rationale follows further down.
+
+---
+
+# v2 &mdash; quiet minimal
 
 The first attempt (dark ink, amber accent, "engineering editorial") missed
 badly. It led with the Riggosaurus 100-GPU number, used a black-and-gold
@@ -171,3 +186,130 @@ README.md
 
 No build step. GitHub Pages serves the files directly. The whole site is
 under 30KB excluding the photo and the Google Fonts subset.
+
+---
+
+# v3 — spatial
+
+## Brief
+
+The user asked for a "high-end modern 3D personal website," explicitly in
+the register of [bruno-simon.com](https://bruno-simon.com) (drivable 3D
+portfolio). Two constraints made a full Bruno-Simon equivalent impossible
+in scope: it has to ship as static files on GitHub Pages (no backend, no
+build step), and a polished interactive 3D world takes months, not a
+single session.
+
+The compromise this version makes: an interactive Three.js scene strong
+enough to feel like a real spatial experience, with a clear path for the
+user (or me, on a follow-up) to grow it into something deeper.
+
+## What v3 actually is
+
+A dark room with a soft horizon glow. The user's initials hang in glass at
+the center. Five iridescent objects orbit the medallion — one for each
+section. Drag to look around. Click an object to open its section as a
+frosted-glass panel that floats over the scene.
+
+| Section | Geometry | Why |
+|---|---|---|
+| about | icosahedron | one of the platonic solids — "the self" |
+| now | torus | a ring, time cycling |
+| work | cube | the solid block of accumulated history |
+| projects | torus knot | connected loops — the projects link into each other |
+| contact | cone | a signal pointing outward |
+
+The shapes are mostly an aesthetic choice; the symbolism is a happy
+accident, not a rule.
+
+## Tech
+
+- **Three.js 0.160**, loaded as ES modules from `unpkg` via an importmap.
+  No bundler, no build step.
+- **`MeshPhysicalMaterial`** for the orbiting shapes, with `transmission`,
+  `iridescence`, and a procedural cubemap environment to give them
+  something to reflect.
+- **A small inline `CanvasTexture`** for the initials on the central
+  medallion. When the user supplies a new photo for v3, this slot becomes
+  an image plane on top of the medallion.
+- **`OrbitControls`** with damping, auto-rotation that pauses on first
+  user interaction.
+- **`Raycaster`** for hover (cursor + scale pulse) and click (opens the
+  panel).
+- HTML panels for content. Doing the section content as DOM (rather than
+  3D text) keeps the copy selectable, screen-reader accessible, and
+  trivial to edit later.
+
+## Color
+
+The v3 palette is its own thing, not a mirror of v2:
+
+| Token | Hex | Usage |
+|---|---|---|
+| `--space` | `#08081A` | Background, deep blue-black |
+| `--ink` | `#F5F5FA` | Primary text |
+| `--ink-soft` | `#C2C2D0` | Secondary text |
+| `--ink-dim` | `#76768A` | Tertiary text, eyebrows |
+| `--accent` | `#8FB5E8` | Iceberg blue — used for highlights, links |
+| `--accent-2` | `#C9B6F0` | Soft violet — second pole of the iridescent gradient |
+
+The accent stays on the cool side deliberately. The brief said "no
+black/gold," so v3 stays away from any warm metallic. The iceberg blue
+plus the soft violet are a deliberate Apple Vision Pro / iOS 17 Liquid
+Glass register, not the Italian luxury palette the design-system tool
+initially suggested.
+
+## Performance
+
+- Pixel ratio capped at `min(devicePixelRatio, 2)`.
+- Particle count halved on screens narrower than 700px (250 instead of
+  600).
+- No `EffectComposer` / postprocessing in v1 — every effect is in the
+  base material.
+- The procedural cubemap is generated once on load (six 256×256 canvases).
+- WebGL feature probe at boot. If WebGL is unavailable, the page
+  immediately redirects to v2.
+
+## Accessibility
+
+- The 3D scene is decorative. All section content is reachable in the DOM
+  via the panel overlays, which are standard HTML.
+- Panels respect ESC to close.
+- A noscript fallback links to v2.
+- `prefers-reduced-motion` collapses transitions to ~0.
+- A persistent "switch to flat" link in the top corner sends the user
+  back to v2 at any time.
+
+## What v3 deliberately is NOT
+
+- A driveable car / Bruno Simon parity. That's weeks of physics work plus
+  custom asset modeling. The current scene is the foundation, not the
+  goal.
+- A flat dark version of v2. v3 has its own palette, its own type
+  treatment, its own register.
+- Mobile-equal experience. The panel UI works on mobile, but the orbit
+  feel and the materials are best on a real machine with hardware
+  acceleration. On phones, recruiters will likely use v2 anyway.
+
+## What v3 could grow into (notes for next time)
+
+- A real custom font for the initials, loaded via `FontLoader`, replaced
+  with the user's actual name in 3D extruded text.
+- Per-section camera animations (fly in / fly out) instead of a static
+  panel overlay.
+- Postprocessing: subtle bloom on the medallion, depth-of-field on the
+  orbit objects when one is focused.
+- A photograph plane on the medallion once the user sends one — already
+  scaffolded in `makeTextTexture` and the central group.
+- Replace the geometric primitives with custom GLTFs that represent the
+  sections more literally: a tiny rig for work, a notebook for now, etc.
+
+## Files
+
+```
+v3/
+  index.html         entry point + panels markup
+  style.css          overlay UI styles
+  main.js            Three.js scene
+```
+
