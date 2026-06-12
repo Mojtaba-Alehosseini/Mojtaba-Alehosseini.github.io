@@ -354,7 +354,7 @@
   }
 
   // minCutoff low enough to hold a steady %, beta high enough to follow a real crumple
-  const opennessFilter = makeOneEuro({ minCutoff: 0.9, beta: 0.7, dCutoff: 1.0 });
+  const opennessFilter = makeOneEuro({ minCutoff: 0.6, beta: 0.7, dCutoff: 1.0 });
 
 
   /* ── Continuous Hand Openness Measurement ─────────────────── */
