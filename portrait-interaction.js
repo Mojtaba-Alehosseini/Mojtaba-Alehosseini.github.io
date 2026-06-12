@@ -94,8 +94,8 @@
      ═════════════════════════════════════════════════════════════ */
 
   const TOTAL_FRAMES = 121;           // ← exact count from ffmpeg extraction
-  const FRAME_PATH   = 'assets/frames/frame';
-  const FRAME_EXT    = '.jpg';
+  const FRAME_PATH   = 'assets/frames-transparent/frame';
+  const FRAME_EXT    = '.png';
 
   const frames       = new Array(TOTAL_FRAMES);
   let   framesLoaded = 0;
