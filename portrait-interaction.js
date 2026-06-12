@@ -19,9 +19,7 @@
   const crumpleCanvas   = document.getElementById('crumpleCanvas');
   const activateBtn     = document.getElementById('activateBtn');
   const deactivateBtn   = document.getElementById('deactivateBtn');
-  const mobileCloseBtn  = document.getElementById('mobileCloseBtn');
   const webcamPanel     = document.getElementById('webcamPanel');
-  const mobileGuide     = document.getElementById('mobileGuide');
   const webcamFeed      = document.getElementById('webcamFeed');
   const inputVideo      = document.getElementById('inputVideo');
   const gestureBadge    = document.getElementById('gestureBadge');
@@ -48,9 +46,6 @@
   const SPOTLIGHT_RADIUS = 90;   // px — reveal circle radius around cursor
   // Fully-transparent mask used to hide the bg layer (mask:none = no mask = visible in standard CSS)
   const MASK_HIDDEN = 'radial-gradient(circle 0px at 0px 0px, transparent 0%, transparent 100%)';
-
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-                   ('ontouchstart' in window && window.innerWidth < 768);
 
 
   /* ═════════════════════════════════════════════════════════════
@@ -148,7 +143,7 @@
   }
 
   /* ── Activation ───────────────────────────────────────────── */
-  if (activateBtn && !isMobile) {
+  if (activateBtn) {
     // Warm up the hand-tracking download the moment the user shows intent,
     // so it's already cached by the time they click (cuts startup lag).
     activateBtn.addEventListener('pointerenter',
@@ -172,8 +167,7 @@
     });
   }
 
-  if (deactivateBtn)  deactivateBtn.addEventListener('click', stopExperience);
-  if (mobileCloseBtn) mobileCloseBtn.addEventListener('click', stopExperience);
+  if (deactivateBtn) deactivateBtn.addEventListener('click', stopExperience);
 
   /* ── Start ────────────────────────────────────────────────── */
   async function startExperience() {
@@ -186,9 +180,7 @@
     // Start the ~5 MB hand-tracking download NOW, in parallel with the
     // transition video, so it's ready by the time the video ends (was loading
     // serially AFTER the video — the main cause of the start-up lag).
-    const scriptsPromise = isMobile
-      ? Promise.resolve()
-      : loadMediaPipeScripts().catch((e) => e);   // resolve to the error; handled below
+    const scriptsPromise = loadMediaPipeScripts().catch((e) => e);   // resolve to the error; handled below
 
     // Kill spotlight
     if (bgLayer) {
@@ -234,12 +226,6 @@
     activateBtn.classList.add('hidden');
     if (motionFlash) motionFlash.classList.add('hidden');
 
-    // ── Mobile path ───────────────────────────────────────────
-    if (isMobile) {
-      if (mobileGuide) mobileGuide.classList.remove('hidden');
-      animFrameId = requestAnimationFrame(renderLoop);
-      return;
-    }
 
     // ── Desktop path: Camera + MediaPipe ──────────────────────
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -313,7 +299,6 @@
 
     // Reset panels
     webcamPanel.classList.add('hidden');
-    if (mobileGuide) mobileGuide.classList.add('hidden');
     if (crumpleCanvas) crumpleCanvas.classList.add('hidden');
 
     // Restore portrait
@@ -484,19 +469,4 @@
     animFrameId = requestAnimationFrame(renderLoop);
   }
 
-
-  /* ── Mobile Touch Fallback ────────────────────────────────── */
-  // Touch-hold = fist (fully crumpled), release = open (fully unfolded)
-  if (isMobile) {
-    container.addEventListener('touchstart', (e) => {
-      if (!isOrigamiActive) return;
-      e.preventDefault();
-      handOpenness = 1.0;   // full fist
-    }, { passive: false });
-
-    container.addEventListener('touchend', () => {
-      if (!isOrigamiActive) return;
-      handOpenness = 0.0;   // fully open
-    });
-  }
 })();
