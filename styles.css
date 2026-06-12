@@ -346,30 +346,21 @@ main {
 .portrait__frame {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 5;
-  background: var(--paper-3);
-  border: 1px solid var(--rule);
+  aspect-ratio: 1 / 1;
+  background: transparent;
+  border: none;
   overflow: hidden;
-  box-shadow:
-    0 1px 0 rgba(0,0,0,0.04),
-    0 20px 40px -20px rgba(0,0,0,0.18);
-  transition: transform var(--t-med), box-shadow var(--t-med);
+  box-shadow: none;
+  transition: transform var(--t-med);
 }
-.portrait__frame::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.05));
-  pointer-events: none;
-}
+/* ::after gradient removed — portrait is transparent, no overlay needed */
 .portrait__frame img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(0.92) contrast(1.02);
-  transition: filter var(--t-med), transform var(--t-med);
+  transition: transform var(--t-med);
 }
-.portrait:hover .portrait__frame img { transform: scale(1.02); }
+/* hover scale removed — proximity interaction handles transforms */
 .portrait__caption {
   display: flex;
   justify-content: space-between;
@@ -387,6 +378,301 @@ main {
   font-style: italic;
   color: var(--muted);
   letter-spacing: 0.04em;
+}
+
+/* ─── INTERACTIVE PORTRAIT ──────────────────────────────────── */
+.hidden { display: none !important; }
+
+.portrait-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.portrait-bg {
+  opacity: 1;       /* always present — CSS mask controls what's visible */
+  transition: none; /* mask replaces opacity fade */
+  z-index: 1;
+  /* Initially hidden via mask set by JS */
+}
+
+.portrait-cutout {
+  z-index: 2;
+}
+
+.portrait-origami,
+#transitionVideo,
+#crumpleCanvas,
+#crumpleVideo {
+  z-index: 3;
+}
+
+/* ── Origami call-to-action ── */
+.origami-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 1.25rem;
+  width: 100%;
+}
+
+/* ── Motion flash — cascading ✦ particles ── */
+.motion-flash {
+  position: relative;
+  height: 28px;
+  width: 50px;
+  pointer-events: none;
+}
+
+.motion-flash__particle {
+  position: absolute;
+  font-size: 0.5rem;
+  color: var(--muted);
+  opacity: 0;
+  animation: flashDrift 4s ease-in-out infinite;
+}
+.motion-flash__particle::before { content: '\2726'; }
+.motion-flash__particle:nth-child(1) { left: 50%;  animation-delay: 0s; }
+.motion-flash__particle:nth-child(2) { left: 25%;  animation-delay: 1.3s; }
+.motion-flash__particle:nth-child(3) { left: 75%;  animation-delay: 2.6s; }
+
+@keyframes flashDrift {
+  0%   { opacity: 0;    transform: translateY(-6px) scale(0.5); }
+  15%  { opacity: 0.85; transform: translateY(4px)  scale(1); }
+  40%  { opacity: 0;    transform: translateY(20px) scale(0.3); }
+  100% { opacity: 0; }
+}
+
+/* ── Origami button ── */
+.origami-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 10px 24px;
+  font-family: var(--sans);
+  font-style: normal;
+  font-size: 0.88rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  background: transparent;
+  border: 1px solid var(--rule-strong);
+  color: var(--muted);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast);
+}
+.origami-btn:hover,
+.origami-btn:focus-visible {
+  color: var(--ink);
+  border-color: var(--ink);
+  background: var(--paper-3);
+  outline: none;
+}
+.origami-btn:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+.origami-btn__icon {
+  font-style: normal;
+  font-size: 0.8em;
+  transition: transform 0.4s ease;
+}
+.origami-btn:hover .origami-btn__icon {
+  transform: rotate(72deg);
+}
+
+/* ── Origami tagline ── */
+.origami-tagline {
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 2px 0 0;
+  letter-spacing: 0.005em;
+}
+.origami-tagline em { font-style: italic; font-weight: 400; }
+
+/* ── Webcam panel — fixed overlay on left half ── */
+.webcam-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  background: rgba(247, 243, 234, 0.88); /* light: --paper + alpha */
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 200;
+  animation: slideInLeft 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root[data-theme="dark"] .webcam-panel {
+  background: rgba(21, 21, 26, 0.9); /* dark: --paper + alpha */
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+.webcam-wrapper {
+  position: relative;
+  width: 460px;
+  aspect-ratio: 4 / 3;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #111;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+}
+
+#webcamFeed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+#landmarkCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(-1);
+  pointer-events: none;
+}
+
+.gesture-badge {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ── Hand guide ── */
+.hand-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--paper-2);
+  min-width: 160px;
+}
+
+.guide-title {
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+  margin: 0;
+  font-weight: 500;
+}
+
+.guide-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.guide-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--rule);
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+
+.guide-step.active {
+  background: var(--paper-3);
+  border-color: var(--rule-strong);
+}
+
+.guide-icon  { font-size: 1.15rem; line-height: 1; }
+.guide-label {
+  font-family: var(--sans);
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+}
+
+/* ── Deactivate / stop button ── */
+.deactivate-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: var(--paper-2);
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: color var(--t-fast), border-color var(--t-fast);
+}
+.deactivate-btn:hover {
+  color: var(--ink);
+  border-color: var(--rule-strong);
+}
+
+/* ── Mobile guide ── */
+.mobile-guide {
+  text-align: center;
+  margin-top: 1.25rem;
+  padding: 1rem 1.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--paper-2);
+  animation: fadeSlideIn 0.4s ease;
+}
+.mobile-guide p {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+@media (max-width: 768px) {
+  .webcam-panel {
+    width: 100vw;
+    height: 60vh;
+    bottom: 0;
+    top: auto;
+    animation: slideInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .webcam-wrapper { width: min(90vw, 340px); }
+  @keyframes slideInUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
 }
 
 /* ─── BLOCK ─────────────────────────────────────────────────── */

@@ -34,6 +34,7 @@
   </script>
 
   <link rel="stylesheet" href="styles.css" />
+  <script src="portrait-interaction.js" defer></script>
 </head>
 <body>
 
@@ -101,14 +102,62 @@
 
       <div class="hero__col hero__col--photo">
         <figure class="portrait">
-          <div class="portrait__frame">
-            <img src="photo.jpg" alt="Portrait of Mojtaba Alehosseini" width="800" height="1000" loading="eager" />
+          <div class="portrait__frame" id="portraitContainer">
+            <!-- Layer 1: Florence background (proximity reveal) -->
+            <img class="portrait-layer portrait-bg" src="assets/photo-original.jpg" alt="" aria-hidden="true" />
+            <!-- Layer 2: Cutout &mdash; default visible state -->
+            <img class="portrait-layer portrait-cutout" src="assets/photo-cutout.png" alt="Portrait of Mojtaba Alehosseini" id="mainPortrait" loading="eager" />
+            <!-- Layer 3: Origami (shown on button click) -->
+            <img class="portrait-layer portrait-origami hidden" src="assets/origami-face.jpeg" alt="Origami portrait" id="origamiPortrait" />
+            <!-- Transition video: cutout &rarr; origami -->
+            <video id="transitionVideo" class="portrait-layer hidden" src="assets/cutout-to-origami.mp4" preload="auto" muted playsinline></video>
+            <!-- Crumple canvas: gesture-frame-rendered -->
+            <canvas id="crumpleCanvas" class="portrait-layer hidden"></canvas>
           </div>
-          <figcaption class="portrait__caption">
-            <em>Genova, 2026</em>
-            <span class="portrait__caption-num">N&deg; 01</span>
-          </figcaption>
         </figure>
+
+        <!-- Motion flash + origami button -->
+        <div class="origami-cta" id="origamiCta">
+          <div class="motion-flash" id="motionFlash" aria-hidden="true">
+            <span class="motion-flash__particle"></span>
+            <span class="motion-flash__particle"></span>
+            <span class="motion-flash__particle"></span>
+          </div>
+          <button id="activateBtn" class="origami-btn">
+            <span class="origami-btn__icon" aria-hidden="true">&#x2726;</span>
+            Interact with origami
+          </button>
+          <p class="origami-tagline"><em>&ldquo;Crafting digital experiences, one fold at a time.&rdquo;</em></p>
+        </div>
+
+        <!-- Webcam panel (desktop &mdash; hidden until activated) -->
+        <div id="webcamPanel" class="webcam-panel hidden">
+          <div class="webcam-wrapper">
+            <video id="webcamFeed" autoplay playsinline muted></video>
+            <canvas id="landmarkCanvas"></canvas>
+            <div id="gestureBadge" class="gesture-badge">&mdash;</div>
+          </div>
+          <div class="hand-guide" id="handGuide">
+            <p class="guide-title">Control the sculpture</p>
+            <div class="guide-steps">
+              <div class="guide-step" id="guideOpen">
+                <span class="guide-icon">&#x1F590;&#xFE0F;</span>
+                <span class="guide-label">Open hand &rarr; unfold</span>
+              </div>
+              <div class="guide-step" id="guideFist">
+                <span class="guide-icon">&#x270A;</span>
+                <span class="guide-label">Close fist &rarr; crumple</span>
+              </div>
+            </div>
+          </div>
+          <button id="deactivateBtn" class="deactivate-btn" aria-label="Stop camera">&#x2715; Stop</button>
+        </div>
+
+        <!-- Mobile touch guide (hidden until activated on touch devices) -->
+        <div id="mobileGuide" class="mobile-guide hidden">
+          <p>Touch &amp; hold the portrait to crumple &middot; release to unfold</p>
+          <button id="mobileCloseBtn" class="deactivate-btn" style="position:static;margin-top:0.75rem;">&#x2715; Stop</button>
+        </div>
       </div>
     </section>
 
@@ -314,6 +363,9 @@
       </div>
     </div>
   </footer>
+
+  <!-- Hidden video for MediaPipe frame processing -->
+  <video id="inputVideo" style="display:none" autoplay playsinline muted></video>
 
   <script src="app.js" defer></script>
 </body>
