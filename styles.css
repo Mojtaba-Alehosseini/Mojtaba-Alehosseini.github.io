@@ -572,6 +572,17 @@ main {
   white-space: nowrap;
 }
 
+/* ── Hand guide row (guide + demo video side by side) ── */
+.guide-row {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: stretch;
+  width: 460px;
+  max-width: 88vw;
+  animation: camPopIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
+}
+
 /* ── Hand guide ── */
 .hand-guide {
   display: flex;
@@ -581,9 +592,17 @@ main {
   border: 1px solid var(--rule);
   border-radius: 10px;
   background: var(--paper-2);
-  width: 320px;
-  max-width: 88vw;
-  animation: camPopIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
+  flex: 1;
+  min-width: 0;
+}
+
+.guide-video {
+  flex: 1;
+  min-width: 0;
+  border-radius: 10px;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
 }
 
 .guide-title {
@@ -724,6 +743,8 @@ main {
     animation: slideInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .webcam-wrapper { width: min(90vw, 340px); }
+  .guide-row { width: min(90vw, 340px); flex-direction: column; }
+  .guide-video { height: 160px; flex: none; }
   @keyframes slideInUp {
     from { transform: translateY(100%); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
