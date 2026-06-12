@@ -572,6 +572,35 @@ main {
   white-space: nowrap;
 }
 
+/* ── Mobile camera loading instruction (overlaid while camera warms up) ── */
+.cam-loading-hint {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--paper-2);
+  z-index: 5;
+  display: none;          /* shown only on mobile, during the loading phase */
+}
+.cam-loading-label {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  padding: 4px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+  pointer-events: none;
+  display: none;          /* shown only on mobile, during the loading phase */
+}
+
 /* ── Hand guide row (guide + demo video side by side) ── */
 .guide-row {
   display: flex;
@@ -713,19 +742,58 @@ main {
 
 
 @media (max-width: 768px) {
+  /* Camera panel flows inline (below the origami) instead of a fixed overlay */
   .webcam-panel {
-    width: 100vw;
-    height: 60vh;
-    bottom: 0;
-    top: auto;
-    animation: slideInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    position: static;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    gap: 14px;
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    z-index: auto;
+    animation: camPopIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
-  .webcam-wrapper { width: min(90vw, 340px); }
-  .guide-row { width: min(90vw, 340px); }
-  .guide-video { max-height: 120px; }
-  @keyframes slideInUp {
-    from { transform: translateY(100%); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
+
+  /* The hand-demo instruction overlay is active on mobile */
+  .cam-loading-hint  { display: block; }
+  .cam-loading-label { display: block; }
+
+  /* Guide + demo video stack vertically below the camera (scroll to reach) */
+  .guide-row {
+    width: min(92vw, 420px);
+    flex-direction: column;
+    margin-top: 4px;
+  }
+  .guide-video { max-height: 160px; width: 100%; }
+
+  /* ── Active experience: origami on top, camera below, sized to fit ── */
+  body.origami-active .hero { gap: 0.6rem; }
+  body.origami-active .hero__col--text { display: none; }
+
+  body.origami-active .hero__col--photo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    scroll-margin-top: 72px;   /* clear the sticky header when scrolled into view */
+  }
+
+  body.origami-active .portrait {
+    width: 100%;
+    max-width: min(36vh, 78vw);
+    margin-inline: auto;
+  }
+  body.origami-active .portrait__caption,
+  body.origami-active .origami-tagline { display: none; }
+  body.origami-active .origami-cta { margin-top: 0; gap: 0; }
+
+  body.origami-active .webcam-wrapper {
+    width: auto;
+    height: 34vh;
+    max-width: 80vw;
+    aspect-ratio: 3 / 4;
   }
 }
 

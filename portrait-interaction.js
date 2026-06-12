@@ -21,7 +21,8 @@
   const deactivateBtn   = document.getElementById('deactivateBtn');
   const webcamPanel     = document.getElementById('webcamPanel');
   const webcamFeed      = document.getElementById('webcamFeed');
-  const inputVideo      = document.getElementById('inputVideo');
+  const camLoadingHint  = document.getElementById('camLoadingHint');
+  const camLoadingLabel = document.getElementById('camLoadingLabel');
   const gestureBadge    = document.getElementById('gestureBadge');
   const guideOpen       = document.getElementById('guideOpen');
   const guideFist       = document.getElementById('guideFist');
@@ -32,7 +33,7 @@
 
   /* ── State ────────────────────────────────────────────────── */
   let handsModel       = null;
-  let cameraUtil       = null;
+  let pumpActive       = false;  // manual frame-pump running flag
   let stream           = null;
   let animFrameId      = null;
   let handOpenness     = 0;    // 0.0 = fully open, 1.0 = full fist (smoothed)
@@ -46,6 +47,10 @@
   const SPOTLIGHT_RADIUS = 90;   // px — reveal circle radius around cursor
   // Fully-transparent mask used to hide the bg layer (mask:none = no mask = visible in standard CSS)
   const MASK_HIDDEN = 'radial-gradient(circle 0px at 0px 0px, transparent 0%, transparent 100%)';
+
+  // Layout-only check (camera path runs for everyone) — true on phones AND a
+  // desktop window narrowed to mobile width.
+  const isMobileView = () => window.matchMedia('(max-width: 768px)').matches;
 
 
   /* ═════════════════════════════════════════════════════════════
@@ -119,9 +124,9 @@
    * On failure the cache resets so a later attempt can retry.          */
   function loadMediaPipeScripts() {
     if (mediaPipePromise) return mediaPipePromise;
+    // We pump frames manually (see startFramePump), so camera_utils/control_utils
+    // are no longer needed — fewer/smaller downloads, faster lock-on.
     const urls = [
-      'https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js',
-      'https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js',
       'https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js',
       'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js',
     ];
@@ -173,11 +178,36 @@
     lastHandSeen    = 0;
     opennessFilter.reset();
 
-    // Kick off both the ~5 MB scripts and the 50 MB frame images in parallel
-    // with the transition video so they're as loaded as possible by the time
-    // the video ends.
+    const mobile          = isMobileView();
+    const activationStart  = performance.now();
+    document.body.classList.add('origami-active');
+
+    // Kick off the scripts, the frame images, AND the camera stream all at once
+    // — in parallel with the transition video — so everything is as ready as
+    // possible by the time the origami has formed.
     const scriptsPromise = loadMediaPipeScripts().catch((e) => e);
     preloadFrames();
+
+    let streamPromise = null;
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      streamPromise = navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false,
+      }).catch((e) => e);
+    }
+
+    // On mobile, reveal the camera area straight away (below the origami) with
+    // the hand-demo instruction overlaid on top while everything loads.
+    if (mobile) {
+      webcamPanel.classList.remove('hidden');
+      if (camLoadingHint)  {
+        camLoadingHint.classList.remove('hidden');
+        camLoadingHint.play().catch(() => {});
+      }
+      if (camLoadingLabel) camLoadingLabel.classList.remove('hidden');
+      const photoCol = container.closest('.hero__col--photo') || container;
+      setTimeout(() => photoCol.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    }
 
     // Kill spotlight
     if (bgLayer) {
@@ -223,15 +253,7 @@
     activateBtn.classList.add('hidden');
     if (motionFlash) motionFlash.classList.add('hidden');
 
-
-    // ── Desktop path: Camera + MediaPipe ──────────────────────
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert('Camera not supported in this browser. Try Chrome or Edge.');
-      stopExperience();
-      return;
-    }
-
-    // Scripts were kicked off in parallel above — usually already loaded by now.
+    // ── Need the hand-tracking scripts ────────────────────────
     const scriptResult = await scriptsPromise;
     if (scriptResult instanceof Error) {
       alert('Failed to load hand-tracking library. Check your connection.');
@@ -239,24 +261,30 @@
       return;
     }
 
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: 640, height: 480 },
-        audio: false,
-      });
-    } catch (_) {
-      alert('Camera access denied. Allow camera to use this feature.');
+    // ── Need the camera stream ────────────────────────────────
+    if (!streamPromise) {
+      alert('Camera not supported in this browser. Try Chrome, Edge, or Safari.');
       stopExperience();
       return;
     }
+    const streamResult = await streamPromise;
+    if (streamResult instanceof Error || !streamResult) {
+      alert('Camera access denied or unavailable. Allow camera access to use this feature.');
+      stopExperience();
+      return;
+    }
+    stream = streamResult;
 
+    // Feed the VISIBLE webcam element. Mobile browsers (notably iOS Safari)
+    // refuse to decode a display:none <video>, which is why hand tracking
+    // silently failed on phones — pumping the on-screen feed fixes it.
     webcamFeed.srcObject = stream;
-    inputVideo.srcObject = stream;
+    try { await webcamFeed.play(); } catch (_) {}
     webcamPanel.classList.remove('hidden');
 
-    // Init MediaPipe Hands
+    // ── Init MediaPipe Hands + manual frame pump ──────────────
     try {
-      /* global Hands, Camera, drawConnectors, drawLandmarks, HAND_CONNECTIONS */
+      /* global Hands, drawConnectors, drawLandmarks, HAND_CONNECTIONS */
       handsModel = new Hands({
         locateFile: (file) =>
           'https://cdn.jsdelivr.net/npm/@mediapipe/hands/' + file,
@@ -270,32 +298,59 @@
       });
 
       handsModel.onResults(onHandResults);
-
-      cameraUtil = new Camera(inputVideo, {
-        onFrame: async () => {
-          if (handsModel) await handsModel.send({ image: inputVideo });
-        },
-        width:  640,
-        height: 480,
-      });
-      cameraUtil.start();
+      startFramePump();
     } catch (e) {
       console.warn('MediaPipe init failed:', e);
       if (gestureBadge) gestureBadge.textContent = 'Hand tracking unavailable';
     }
 
+    // Drop the loading instruction once we're live (kept up ≥4s on mobile so it
+    // doesn't flash away too quickly), revealing the live camera feed.
+    if (mobile) {
+      const elapsed = performance.now() - activationStart;
+      setTimeout(() => {
+        if (camLoadingHint)  camLoadingHint.classList.add('hidden');
+        if (camLoadingLabel) camLoadingLabel.classList.add('hidden');
+      }, Math.max(0, 4000 - elapsed));
+    }
+
     animFrameId = requestAnimationFrame(renderLoop);
+  }
+
+  /* ── Frame pump: push the VISIBLE webcam feed into MediaPipe ───
+   * Reads the on-screen <video> (not a hidden one) so detection works
+   * on mobile browsers that suspend display:none media. Prefers
+   * requestVideoFrameCallback; falls back to a timer.                 */
+  function startFramePump() {
+    pumpActive = true;
+    const tick = async () => {
+      if (!pumpActive || !handsModel) return;
+      if (webcamFeed.readyState >= 2 && webcamFeed.videoWidth > 0) {
+        try { await handsModel.send({ image: webcamFeed }); } catch (_) { /* frame skipped */ }
+      }
+      if (!pumpActive) return;
+      if ('requestVideoFrameCallback' in webcamFeed) {
+        webcamFeed.requestVideoFrameCallback(tick);
+      } else {
+        setTimeout(tick, 33);
+      }
+    };
+    tick();
   }
 
   /* ── Stop ─────────────────────────────────────────────────── */
   function stopExperience() {
-    if (cameraUtil)  { cameraUtil.stop();  cameraUtil  = null; }
+    pumpActive = false;
     if (handsModel)  { handsModel.close(); handsModel  = null; }
     if (stream) { stream.getTracks().forEach((t) => t.stop()); stream = null; }
     if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
 
+    document.body.classList.remove('origami-active');
+
     // Reset panels
     webcamPanel.classList.add('hidden');
+    if (camLoadingHint)  camLoadingHint.classList.add('hidden');
+    if (camLoadingLabel) camLoadingLabel.classList.add('hidden');
     if (crumpleCanvas) crumpleCanvas.classList.add('hidden');
 
     // Restore portrait
