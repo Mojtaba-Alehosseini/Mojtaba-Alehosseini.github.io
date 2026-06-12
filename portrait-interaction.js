@@ -96,6 +96,7 @@
   let   framesReady  = false;
 
   function preloadFrames() {
+    if (framesLoaded > 0) return;   // already started
     for (let i = 0; i < TOTAL_FRAMES; i++) {
       const img = new Image();
       const num  = String(i + 1).padStart(4, '0');
@@ -107,9 +108,6 @@
       frames[i] = img;
     }
   }
-
-  // Start loading immediately — zero impact on page since images are small JPEGs
-  preloadFrames();
 
 
   /* ═════════════════════════════════════════════════════════════
@@ -127,18 +125,15 @@
       'https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js',
       'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js',
     ];
-    mediaPipePromise = (async () => {
-      for (const src of urls) {
-        await new Promise((resolve, reject) => {
-          const s       = document.createElement('script');
-          s.src         = src;
-          s.crossOrigin = 'anonymous';
-          s.onload      = resolve;
-          s.onerror     = () => reject(new Error('Failed to load ' + src));
-          document.head.appendChild(s);
-        });
-      }
-    })().catch((e) => { mediaPipePromise = null; throw e; });
+    mediaPipePromise = Promise.all(urls.map((src) => new Promise((resolve, reject) => {
+      const s       = document.createElement('script');
+      s.src         = src;
+      s.async       = false;   // download in parallel, execute in insertion order
+      s.crossOrigin = 'anonymous';
+      s.onload      = resolve;
+      s.onerror     = () => reject(new Error('Failed to load ' + src));
+      document.head.appendChild(s);
+    }))).then(() => {}).catch((e) => { mediaPipePromise = null; throw e; });
     return mediaPipePromise;
   }
 
@@ -146,9 +141,10 @@
   if (activateBtn) {
     // Warm up the hand-tracking download the moment the user shows intent,
     // so it's already cached by the time they click (cuts startup lag).
-    activateBtn.addEventListener('pointerenter',
-      () => { loadMediaPipeScripts().catch(() => {}); },
-      { once: true });
+    activateBtn.addEventListener('pointerenter', () => {
+      loadMediaPipeScripts().catch(() => {});
+      preloadFrames();
+    }, { once: true });
   }
 
   if (activateBtn) {
@@ -177,10 +173,11 @@
     lastHandSeen    = 0;
     opennessFilter.reset();
 
-    // Start the ~5 MB hand-tracking download NOW, in parallel with the
-    // transition video, so it's ready by the time the video ends (was loading
-    // serially AFTER the video — the main cause of the start-up lag).
-    const scriptsPromise = loadMediaPipeScripts().catch((e) => e);   // resolve to the error; handled below
+    // Kick off both the ~5 MB scripts and the 50 MB frame images in parallel
+    // with the transition video so they're as loaded as possible by the time
+    // the video ends.
+    const scriptsPromise = loadMediaPipeScripts().catch((e) => e);
+    preloadFrames();
 
     // Kill spotlight
     if (bgLayer) {
