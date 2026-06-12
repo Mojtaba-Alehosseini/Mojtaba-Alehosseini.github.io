@@ -15,7 +15,6 @@
 
   const bgLayer         = container.querySelector('.portrait-bg');
   const mainPortrait    = document.getElementById('mainPortrait');
-  const origamiPortrait = document.getElementById('origamiPortrait');
   const transitionVideo = document.getElementById('transitionVideo');
   const crumpleCanvas   = document.getElementById('crumpleCanvas');
   const activateBtn     = document.getElementById('activateBtn');
@@ -34,15 +33,15 @@
   const crumpleCtx      = crumpleCanvas  ? crumpleCanvas.getContext('2d')  : null;
 
   /* ── State ────────────────────────────────────────────────── */
-  let handsModel      = null;
-  let cameraUtil      = null;
-  let stream          = null;
-  let animFrameId     = null;
-  let handOpenness    = 0;    // 0.0 = fully open, 1.0 = full fist (smoothed)
-  let isOrigamiActive = false;
-  let scriptsLoaded   = false;
-  let handVisible     = false; // is a hand currently detected this frame
-  let lastHandSeen    = 0;     // performance.now() of last frame a hand was seen
+  let handsModel       = null;
+  let cameraUtil       = null;
+  let stream           = null;
+  let animFrameId      = null;
+  let handOpenness     = 0;    // 0.0 = fully open, 1.0 = full fist (smoothed)
+  let isOrigamiActive  = false;
+  let mediaPipePromise = null; // cached loader promise (hover + click share it)
+  let handVisible      = false; // is a hand currently detected this frame
+  let lastHandSeen     = 0;     // performance.now() of last frame a hand was seen
 
   const NO_HAND_RESET_MS = 5000;  // no hand for 5s → ease crumple back to 0%
 
@@ -122,29 +121,41 @@
      FEATURE 2 — Gesture-Controlled Origami Interaction
      ═════════════════════════════════════════════════════════════ */
 
-  /* ── Dynamic MediaPipe loader (≈5 MB, only on demand) ─────── */
-  async function loadMediaPipeScripts() {
-    if (scriptsLoaded) return;
+  /* ── Dynamic MediaPipe loader (≈5 MB, only on demand) ─────────
+   * Cached promise so a hover-preload and the click share ONE download.
+   * On failure the cache resets so a later attempt can retry.          */
+  function loadMediaPipeScripts() {
+    if (mediaPipePromise) return mediaPipePromise;
     const urls = [
       'https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js',
       'https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js',
       'https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js',
       'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js',
     ];
-    for (const src of urls) {
-      await new Promise((resolve, reject) => {
-        const s         = document.createElement('script');
-        s.src           = src;
-        s.crossOrigin   = 'anonymous';
-        s.onload        = resolve;
-        s.onerror       = () => reject(new Error('Failed to load ' + src));
-        document.head.appendChild(s);
-      });
-    }
-    scriptsLoaded = true;
+    mediaPipePromise = (async () => {
+      for (const src of urls) {
+        await new Promise((resolve, reject) => {
+          const s       = document.createElement('script');
+          s.src         = src;
+          s.crossOrigin = 'anonymous';
+          s.onload      = resolve;
+          s.onerror     = () => reject(new Error('Failed to load ' + src));
+          document.head.appendChild(s);
+        });
+      }
+    })().catch((e) => { mediaPipePromise = null; throw e; });
+    return mediaPipePromise;
   }
 
   /* ── Activation ───────────────────────────────────────────── */
+  if (activateBtn && !isMobile) {
+    // Warm up the hand-tracking download the moment the user shows intent,
+    // so it's already cached by the time they click (cuts startup lag).
+    activateBtn.addEventListener('pointerenter',
+      () => { loadMediaPipeScripts().catch(() => {}); },
+      { once: true });
+  }
+
   if (activateBtn) {
     activateBtn.addEventListener('click', async () => {
       const originalHTML    = activateBtn.innerHTML;
@@ -171,6 +182,13 @@
     handVisible     = false;
     lastHandSeen    = 0;
     opennessFilter.reset();
+
+    // Start the ~5 MB hand-tracking download NOW, in parallel with the
+    // transition video, so it's ready by the time the video ends (was loading
+    // serially AFTER the video — the main cause of the start-up lag).
+    const scriptsPromise = isMobile
+      ? Promise.resolve()
+      : loadMediaPipeScripts().catch((e) => e);   // resolve to the error; handled below
 
     // Kill spotlight
     if (bgLayer) {
@@ -201,15 +219,16 @@
       mainPortrait.style.opacity    = '0';
     }
 
-    // ── Switch to origami layers ──────────────────────────────
+    // ── Switch to the crumple canvas ──────────────────────────
+    // No static origami image layer — the transparent canvas frames are the
+    // sole origami display, so nothing shows behind/through them.
     mainPortrait.classList.add('hidden');
-    origamiPortrait.classList.remove('hidden');
 
-    // Set canvas size to match frame images
     if (crumpleCanvas) {
       crumpleCanvas.width  = 800;
       crumpleCanvas.height = 800;
       crumpleCanvas.classList.remove('hidden');
+      drawCurrentFrame();   // paint frame 0 (intact origami) immediately, no blank flash
     }
 
     activateBtn.classList.add('hidden');
@@ -229,8 +248,9 @@
       return;
     }
 
-    try { await loadMediaPipeScripts(); }
-    catch (_) {
+    // Scripts were kicked off in parallel above — usually already loaded by now.
+    const scriptResult = await scriptsPromise;
+    if (scriptResult instanceof Error) {
       alert('Failed to load hand-tracking library. Check your connection.');
       stopExperience();
       return;
@@ -261,9 +281,9 @@
 
       handsModel.setOptions({
         maxNumHands:            1,
-        modelComplexity:        1,
-        minDetectionConfidence: 0.75,
-        minTrackingConfidence:  0.6,
+        modelComplexity:        0,    // lite model: smaller download + faster inference → locks on quicker
+        minDetectionConfidence: 0.5,  // lower = recognises the hand sooner
+        minTrackingConfidence:  0.5,
       });
 
       handsModel.onResults(onHandResults);
@@ -294,7 +314,6 @@
     // Reset panels
     webcamPanel.classList.add('hidden');
     if (mobileGuide) mobileGuide.classList.add('hidden');
-    origamiPortrait.classList.add('hidden');
     if (crumpleCanvas) crumpleCanvas.classList.add('hidden');
 
     // Restore portrait
@@ -436,6 +455,17 @@
   }
 
 
+  /* ── Draw the frame for the current openness (drawn on demand + per rAF) ── */
+  function drawCurrentFrame() {
+    if (!crumpleCtx) return;
+    const idx   = Math.round(handOpenness * (frames.length - 1));
+    const frame = frames[Math.max(0, Math.min(idx, frames.length - 1))];
+    if (frame && frame.complete && frame.naturalWidth > 0) {
+      crumpleCtx.clearRect(0, 0, crumpleCanvas.width, crumpleCanvas.height);
+      crumpleCtx.drawImage(frame, 0, 0, crumpleCanvas.width, crumpleCanvas.height);
+    }
+  }
+
   /* ── Canvas Render Loop ───────────────────────────────────── */
   function renderLoop() {
     // No hand for 5s → smoothly unfold back to 0% (fully open / intact face)
@@ -450,14 +480,7 @@
       }
     }
 
-    if (crumpleCtx && framesReady) {
-      const idx   = Math.round(handOpenness * (frames.length - 1));
-      const frame = frames[Math.max(0, Math.min(idx, frames.length - 1))];
-      if (frame && frame.complete && frame.naturalWidth > 0) {
-        crumpleCtx.clearRect(0, 0, crumpleCanvas.width, crumpleCanvas.height);
-        crumpleCtx.drawImage(frame, 0, 0, crumpleCanvas.width, crumpleCanvas.height);
-      }
-    }
+    drawCurrentFrame();
     animFrameId = requestAnimationFrame(renderLoop);
   }
 

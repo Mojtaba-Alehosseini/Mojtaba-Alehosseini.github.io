@@ -107,8 +107,6 @@
             <img class="portrait-layer portrait-bg" src="assets/photo-original.jpg" alt="" aria-hidden="true" />
             <!-- Layer 2: Cutout &mdash; default visible state -->
             <img class="portrait-layer portrait-cutout" src="assets/photo-cutout.png" alt="Portrait of Mojtaba Alehosseini" id="mainPortrait" loading="eager" />
-            <!-- Layer 3: Origami (shown on button click) -->
-            <img class="portrait-layer portrait-origami hidden" src="assets/origami-face.jpeg" alt="Origami portrait" id="origamiPortrait" />
             <!-- Transition video: cutout &rarr; origami -->
             <video id="transitionVideo" class="portrait-layer hidden" preload="auto" muted playsinline>
               <source src="assets/cutout-to-origami-transparent.webm" type="video/webm" />
@@ -143,16 +141,25 @@
           </div>
           <div class="hand-guide" id="handGuide">
             <p class="guide-title">Control the sculpture</p>
+            <p class="guide-intro">
+              Hold your hand up to the camera. The paper follows your fingers in
+              real time &mdash; how far you close your hand sets how crumpled it gets.
+            </p>
             <div class="guide-steps">
               <div class="guide-step" id="guideOpen">
                 <span class="guide-icon">&#x1F590;&#xFE0F;</span>
-                <span class="guide-label">Open hand &rarr; unfold</span>
+                <span class="guide-label"><strong>Open hand</strong> &rarr; smooth, intact origami (0%)</span>
               </div>
               <div class="guide-step" id="guideFist">
                 <span class="guide-icon">&#x270A;</span>
-                <span class="guide-label">Close fist &rarr; crumple</span>
+                <span class="guide-label"><strong>Close fist</strong> &rarr; fully crumpled ball (100%)</span>
               </div>
             </div>
+            <p class="guide-hint">
+              Stop part-way and hold to freeze the fold at any point &mdash; every
+              finger position maps to a frame. The badge on the camera shows the
+              live %. Hide your hand for a few seconds and it smooths back to 0%.
+            </p>
           </div>
         </div>
 

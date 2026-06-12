@@ -531,6 +531,13 @@ main {
   overflow: hidden;
   background: #111;
   box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+  /* dedicated entrance motion for the camera window (after the panel slides in) */
+  animation: camPopIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+@keyframes camPopIn {
+  from { opacity: 0; transform: scale(0.92) translateY(14px); }
+  to   { opacity: 1; transform: none; }
 }
 
 #webcamFeed {
@@ -569,12 +576,14 @@ main {
 .hand-guide {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px 14px;
+  gap: 10px;
+  padding: 14px 16px;
   border: 1px solid var(--rule);
   border-radius: 10px;
   background: var(--paper-2);
-  min-width: 160px;
+  width: 320px;
+  max-width: 88vw;
+  animation: camPopIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
 }
 
 .guide-title {
@@ -584,7 +593,25 @@ main {
   letter-spacing: 0.09em;
   color: var(--muted);
   margin: 0;
-  font-weight: 500;
+  font-weight: 600;
+}
+
+.guide-intro {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.guide-hint {
+  font-family: var(--sans);
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 2px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
 }
 
 .guide-steps {
@@ -596,8 +623,8 @@ main {
 .guide-step {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
+  gap: 9px;
+  padding: 7px 10px;
   border-radius: 7px;
   border: 1px solid var(--rule);
   transition: background var(--t-fast), border-color var(--t-fast);
@@ -608,12 +635,14 @@ main {
   border-color: var(--rule-strong);
 }
 
-.guide-icon  { font-size: 1.15rem; line-height: 1; }
+.guide-icon  { font-size: 1.25rem; line-height: 1; flex-shrink: 0; }
 .guide-label {
   font-family: var(--sans);
   font-size: 0.76rem;
+  line-height: 1.35;
   color: var(--ink-soft);
 }
+.guide-label strong { color: var(--ink); font-weight: 600; }
 
 /* ── Camera feed close button (overlaid on the video) ── */
 .cam-close-btn {
