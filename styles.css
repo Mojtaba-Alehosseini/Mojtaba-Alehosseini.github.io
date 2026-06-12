@@ -743,8 +743,8 @@ main {
     animation: slideInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .webcam-wrapper { width: min(90vw, 340px); }
-  .guide-row { width: min(90vw, 340px); flex-direction: column; }
-  .guide-video { height: 160px; flex: none; }
+  .guide-row { width: min(90vw, 340px); }
+  .guide-video { max-height: 120px; }
   @keyframes slideInUp {
     from { transform: translateY(100%); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
