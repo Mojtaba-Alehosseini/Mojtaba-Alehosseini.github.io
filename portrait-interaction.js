@@ -38,9 +38,13 @@
   let cameraUtil      = null;
   let stream          = null;
   let animFrameId     = null;
-  let handOpenness    = 0;    // 0.0 = fully open, 1.0 = full fist
+  let handOpenness    = 0;    // 0.0 = fully open, 1.0 = full fist (smoothed)
   let isOrigamiActive = false;
   let scriptsLoaded   = false;
+  let handVisible     = false; // is a hand currently detected this frame
+  let lastHandSeen    = 0;     // performance.now() of last frame a hand was seen
+
+  const NO_HAND_RESET_MS = 5000;  // no hand for 5s → ease crumple back to 0%
 
   const SPOTLIGHT_RADIUS = 90;   // px — reveal circle radius around cursor
   // Fully-transparent mask used to hide the bg layer (mask:none = no mask = visible in standard CSS)
@@ -163,6 +167,10 @@
   /* ── Start ────────────────────────────────────────────────── */
   async function startExperience() {
     isOrigamiActive = true;
+    handOpenness    = 0;
+    handVisible     = false;
+    lastHandSeen    = 0;
+    opennessFilter.reset();
 
     // Kill spotlight
     if (bgLayer) {
@@ -303,11 +311,50 @@
 
     // Reset state
     handOpenness    = 0;
+    handVisible     = false;
+    lastHandSeen    = 0;
+    opennessFilter.reset();
     isOrigamiActive = false;
     if (gestureBadge) gestureBadge.textContent = '\u2014';
     if (guideOpen)    guideOpen.classList.remove('active');
     if (guideFist)    guideFist.classList.remove('active');
   }
+
+
+  /* ── One Euro Filter ──────────────────────────────────────────
+   * Smooths jitter while staying responsive — the standard fix for
+   * noisy interactive signals (https://gery.casiez.net/1euro/).
+   *   • Holding steady  → heavy smoothing  → kills the 55↔57% wobble
+   *   • Moving the hand → light smoothing   → stays accurate, low lag
+   * Tune: lower minCutoff = steadier when still; higher beta = snappier
+   * when moving fast.                                                 */
+  function makeOneEuro({ minCutoff = 1.0, beta = 0.6, dCutoff = 1.0 } = {}) {
+    let xPrev = null, dxPrev = 0, tPrev = null;
+    const alpha = (cutoff, dt) => {
+      const tau = 1 / (2 * Math.PI * cutoff);
+      return 1 / (1 + tau / dt);
+    };
+    return {
+      filter(x, t) {
+        if (xPrev === null) { xPrev = x; tPrev = t; return x; }
+        let dt = (t - tPrev) / 1000;          // seconds
+        if (!(dt > 0)) dt = 1 / 30;            // guard 0 / negative dt
+        tPrev = t;
+        const dx     = (x - xPrev) / dt;
+        const aD     = alpha(dCutoff, dt);
+        const dxHat  = aD * dx + (1 - aD) * dxPrev;
+        const cutoff = minCutoff + beta * Math.abs(dxHat);
+        const a      = alpha(cutoff, dt);
+        const xHat   = a * x + (1 - a) * xPrev;
+        xPrev = xHat; dxPrev = dxHat;
+        return xHat;
+      },
+      reset() { xPrev = null; dxPrev = 0; tPrev = null; },
+    };
+  }
+
+  // minCutoff low enough to hold a steady %, beta high enough to follow a real crumple
+  const opennessFilter = makeOneEuro({ minCutoff: 0.9, beta: 0.7, dCutoff: 1.0 });
 
 
   /* ── Continuous Hand Openness Measurement ─────────────────── */
@@ -349,11 +396,16 @@
     lCtx.clearRect(0, 0, landmarkCanvas.width, landmarkCanvas.height);
 
     if (!results.multiHandLandmarks || !results.multiHandLandmarks.length) {
+      // No hand — hold the current frame; renderLoop eases to 0% after 5s
+      handVisible = false;
       if (gestureBadge) gestureBadge.textContent = 'Show your hand';
       if (guideOpen)    guideOpen.classList.remove('active');
       if (guideFist)    guideFist.classList.remove('active');
       return;
     }
+
+    handVisible  = true;
+    lastHandSeen = performance.now();
 
     const landmarks = results.multiHandLandmarks[0];
 
@@ -364,8 +416,9 @@
       drawLandmarks(lCtx, landmarks, { color: '#ffffff', radius: 2 });
     } catch (_) { /* drawing utils may not be loaded */ }
 
-    // Continuous openness value
-    handOpenness = measureHandOpenness(landmarks);
+    // Raw measurement → One Euro smoothing (steady when still, snappy when moving)
+    const raw    = measureHandOpenness(landmarks);
+    handOpenness = opennessFilter.filter(raw, lastHandSeen);
     const pct    = Math.round(handOpenness * 100);
 
     if (gestureBadge) gestureBadge.textContent = `${pct}% crumpled`;
@@ -385,6 +438,18 @@
 
   /* ── Canvas Render Loop ───────────────────────────────────── */
   function renderLoop() {
+    // No hand for 5s → smoothly unfold back to 0% (fully open / intact face)
+    if (!handVisible && lastHandSeen &&
+        (performance.now() - lastHandSeen > NO_HAND_RESET_MS)) {
+      if (handOpenness > 0.005) {
+        handOpenness += (0 - handOpenness) * 0.08;   // ease toward 0 (~1s)
+      } else if (handOpenness !== 0) {
+        handOpenness = 0;
+        opennessFilter.reset();                      // clean restart on re-detect
+        if (gestureBadge) gestureBadge.textContent = 'Show your hand';
+      }
+    }
+
     if (crumpleCtx && framesReady) {
       const idx   = Math.round(handOpenness * (frames.length - 1));
       const frame = frames[Math.max(0, Math.min(idx, frames.length - 1))];
