@@ -183,7 +183,7 @@ body::before {
   gap: 0.5rem;
 }
 
-.top__spatial {
+.top__play {
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
@@ -195,13 +195,13 @@ body::before {
   letter-spacing: 0.02em;
   transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast);
 }
-.top__spatial:hover, .top__spatial:focus-visible {
+.top__play:hover, .top__play:focus-visible {
   color: var(--ink);
   border-color: var(--ink);
   background: var(--paper-3);
   outline: none;
 }
-@media (max-width: 540px) { .top__spatial span { display: none; } }
+@media (max-width: 540px) { .top__play span { display: none; } }
 
 .top__toggle {
   width: 2.1rem;
