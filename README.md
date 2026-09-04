@@ -9,11 +9,16 @@ as-is.
 
 ```
 index.html              markup + copy
-styles.css              single-column visual system, tokens at the top
-app.js                  theme toggle, footer year, live GitHub fetch
-photo.jpg               800x1000 portrait
+styles.css              tokens, top bar, hero, sections, portrait + origami
+viz.css                 the two repository figures (ring and radar)
+app.js                  theme toggle, scroll reveal
+portrait-interaction.js webcam hand tracking for the origami portrait
+repos-data.js           every public repo, generated from the GitHub API
+repo-nest.js            ring figure: repos by field, languages on the outer ring
+repo-radar.js           radar figure: repos weighed by field, drag to spin
+assets/                 portrait, origami video, hand demo
+CV/                     the current CV (PDF)
 404.html                error page in the same system
-CV/                     LaTeX source and rendered PDF
 sitemap.xml             two URLs
 ```
 
