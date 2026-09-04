@@ -8,6 +8,8 @@
    · momentum projection (exponential decay) picks the landing axis
    · springs are interruptible: a new grab starts from the live value
    · damping 1.0 for plain moves, 0.8 only after a real flick
+   Hover previews a repository in the card beside the chart, click pins it.
+   Nothing moves on hover except the dot itself.
    Motion is additive: the resting state is drawn first, so a stalled
    animation clock can never leave anything hidden.
    ============================================================ */
@@ -26,7 +28,7 @@
     {key:"Forks",label:"Forks",color:"#8C857A"}
   ].filter(function(a){ return R.some(function(r){ return r.dom===a.key; }); });
 
-  var CX=560, CY=360, R0=62, R1=292, NA=AXES.length, STEP=360/NA;
+  var CX=560, CY=360, R0=62, R1=284, NA=AXES.length, STEP=360/NA;
   var REDUCED=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
   var SVGNS="http://www.w3.org/2000/svg";
   function E(t,a){ var e=document.createElementNS(SVGNS,t); for(var k in a) e.setAttribute(k,a[k]); return e; }
@@ -44,7 +46,7 @@
   function f2(p){ return p[0].toFixed(1)+","+p[1].toFixed(1); }
 
   var svg=document.getElementById("rr-svg");
-  var tip=document.getElementById("rr-tip");
+  var detail=document.getElementById("rr-detail");
   var stage=document.getElementById("rr-stage");
 
   /* ---- static frame: rings + spokes (do not rotate with content) ---- */
@@ -157,7 +159,7 @@
     svg.setPointerCapture(e.pointerId);
     spin.v=0; spin.t=spin.x;                 /* interrupt: hold the live value */
     drag={a0:angleAt(e),r0:spin.x}; hist=[{a:0,t:performance.now()}];
-    svg.classList.add("drag"); hideTip();
+    svg.classList.add("drag");
   });
   svg.addEventListener("pointermove",function(e){
     if(!drag) return;
@@ -182,33 +184,35 @@
   svg.addEventListener("pointerup",release);
   svg.addEventListener("pointercancel",release);
 
-  /* ---- hover a dot: instant highlight, glass readout ---- */
-  function showTip(c){
-    var r=c._r, a=r._axis, b=c.getBoundingClientRect(), s=stage.getBoundingClientRect();
-    tip.innerHTML='<div class="rr-t-k" style="color:'+a.color+'">'+esc(a.label)+'</div>'+
-      '<div class="rr-t-n">'+esc(r.n)+(r.f?' <span style="color:#C49A45">\u2605</span>':'')+'</div>'+
-      '<div class="rr-t-m"><span>'+esc(r.lang)+'</span><span>'+fmt(r.s)+'</span><span>\u2019'+(""+r.y).slice(2)+'</span></div>'+
-      (r.desc?'<div class="rr-t-d">'+esc(r.desc)+'</div>':'');
-    var st=stage.getBoundingClientRect();
-    var cx0=b.left+b.width/2-st.left;
-    cx0=Math.max(110,Math.min(st.width-110,cx0));
-    var below=(b.top-st.top)<200;   /* not enough room above: flip under the dot */
-    tip.style.left=cx0+"px";
-    tip.style.top=(below?(b.bottom-st.top+10):(b.top-st.top-8))+"px";
-    tip.style.transform=below?"translate(-50%,0)":"translate(-50%,-100%)";
-    tip.classList.add("on");
+  /* ---- hover previews, click pins; the card is never empty ---- */
+  var LANGC={"Python":"#5B93C4","Jupyter Notebook":"#E0982E","C++":"#D85C46","TypeScript":"#3FA796","JavaScript":"#E0B83C","HTML":"#D2743E","MATLAB":"#9170C0","VBA":"#6FA563","Mathematica":"#C95E89","Solidity":"#7A8A99","FreeBasic":"#BE9A5A","Other":"#A39B8B"};
+  var DEFAULT=R.filter(function(r){ return r.n==="hpc-gemm-openmp-mpi-cuda"; })[0] || R.filter(function(r){ return r.f&&r.desc; })[0] || R[0];
+  var FIELD_LABEL={"ML & Data":"Machine Learning","Simulation & OR":"Simulation & OR","Systems & Algorithms":"Systems & Algorithms","Web & Interactive":"Web & Interactive","Blockchain":"Blockchain","Profile / Meta":"Profile","Forks":"Forks"};
+  var pinned=DEFAULT, revert=null;
+  function card(r,anim){
+    if(!detail||!window.repoCard) return;
+    if(detail.dataset.repo===r.n) return;
+    detail.dataset.repo=r.n;
+    detail.innerHTML=window.repoCard(r,{fieldLabel:FIELD_LABEL[r._axis.key]||r._axis.label,fieldColor:r._axis.color,langColor:LANGC[r.lang]||LANGC.Other,closable:r!==DEFAULT});
+    detail.classList.toggle("on",r!==DEFAULT);
+    var cb=detail.querySelector(".rn-d-close"); if(cb) cb.addEventListener("click",function(e){ e.stopPropagation(); pin(DEFAULT); });
+    if(anim&&!REDUCED&&detail.animate){ var kids=detail.children; for(var i=0;i<kids.length;i++){ try{ kids[i].animate([{transform:"translateY(6px)"},{transform:"none"}],{duration:340,delay:i*42,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"}); }catch(e){} } }
   }
-  function hideTip(){ tip.classList.remove("on"); }
+  function preview(r){ clearTimeout(revert); card(r,false); }
+  function unpreview(){ clearTimeout(revert); revert=setTimeout(function(){ card(pinned,false); },260); }
+  function pin(r){ clearTimeout(revert); pinned=r; card(r,true); }
   dotEls.forEach(function(c){
     c.addEventListener("pointerenter",function(){
       c.setAttribute("r",(c._base*1.9).toFixed(1));   /* feedback on enter, not on click */
-      lift[c._r._axis.key].set(1); kick(); showTip(c);
+      kick(); preview(c._r);
     });
     c.addEventListener("pointerleave",function(){
       c.setAttribute("r",c._base.toFixed(1));
-      lift[c._r._axis.key].set(0); kick(); hideTip();
+      kick(); unpreview();
     });
-    c.addEventListener("click",function(e){ e.stopPropagation(); if(c._r.u) window.open(c._r.u,"_blank","noopener"); });
+    c.addEventListener("click",function(e){ e.stopPropagation(); pin(c._r); });
+    c.setAttribute("tabindex","0"); c.setAttribute("role","button"); c.setAttribute("aria-label",c._r.n);
+    c.addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pin(c._r); } });
   });
 
   /* ---- legend: isolate one field ---- */
@@ -221,7 +225,7 @@
     b.addEventListener("click",function(){
       iso=(iso===a.key)?null:a.key;
       svg.classList.toggle("iso",!!iso);
-      AXES.forEach(function(x){ byAxis[x.key].g.classList.toggle("on",iso===x.key); lift[x.key].set(iso===x.key?1:0); });
+      AXES.forEach(function(x){ byAxis[x.key].g.classList.toggle("on",iso===x.key); });
       [].forEach.call(legend.children,function(el,i){ el.classList.toggle("on",AXES[i].key===iso); });
       if(iso){ spin.z=1; spin.r=0.42; spin.set(-A.base); }   /* bring it to the top */
       kick();
@@ -230,8 +234,9 @@
   });
 
   /* portrait containers crop to the radar's square core so phones aren't letterboxed */
-  function updateVB(){ var r=stage.getBoundingClientRect(), narrow=r.width/Math.max(1,r.height)<1.15; svg.setAttribute("viewBox", narrow ? "208 8 704 704" : "0 0 1180 720"); svg.classList.toggle("narrow",narrow&&r.width<560); }
+  function updateVB(){ var r=stage.getBoundingClientRect(); svg.setAttribute("viewBox","200 0 720 720"); svg.classList.toggle("narrow",r.width<560); }
   window.addEventListener("resize",updateVB); updateVB();
+  card(DEFAULT,false);
 
   /* entrance: dots ease out from the centre when first seen — additive, never hides anything */
   if(!REDUCED&&window.requestAnimationFrame){

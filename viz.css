@@ -15,7 +15,8 @@
 }
 
 /* ===== Nest ===== */
-.rn-wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:clamp(20px,3vw,40px);align-items:center;}
+.rn-wrap,.rr-wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:clamp(18px,3vw,36px);align-items:center;}
+.rr-col{min-width:0;}
 .rn-stage{position:relative;width:100%;}
 #rn-figure{position:relative;width:100%;aspect-ratio:1/1;border-radius:12px;}\n#rn-figure:focus{outline:none;}\n#rn-figure:focus-visible{outline:2px solid var(--accent);outline-offset:8px;}
 #rn-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;display:block;}
@@ -74,11 +75,11 @@
 /* detail card — a distinct raised surface, not glass: it sits beside the
    figure and never floats over it, so there is nothing to refract. Real
    shadow and hairline carry the separation. */
-#rn-detail{position:relative;background:var(--card);border:1px solid var(--line-2);border-radius:26px;padding:0;overflow:hidden;
+.repo-card{position:relative;background:var(--card);border:1px solid var(--line-2);border-radius:26px;padding:0;overflow:hidden;
   box-shadow:0 1px 0 rgba(255,255,255,.7) inset, 0 26px 60px -30px rgba(28,22,12,.5);min-height:300px;
   transition:box-shadow .3s var(--eo);}
-#rn-detail.on{box-shadow:0 1px 0 rgba(255,255,255,.7) inset, 0 34px 72px -32px rgba(28,22,12,.6);}
-:root[data-theme="dark"] #rn-detail{box-shadow:0 1px 0 rgba(255,255,255,.06) inset, 0 26px 60px -30px rgba(0,0,0,.7);}
+.repo-card.on{box-shadow:0 1px 0 rgba(255,255,255,.7) inset, 0 34px 72px -32px rgba(28,22,12,.6);}
+:root[data-theme="dark"] .repo-card{box-shadow:0 1px 0 rgba(255,255,255,.06) inset, 0 26px 60px -30px rgba(0,0,0,.7);}
 .rn-d-close{position:absolute;top:15px;right:15px;z-index:2;width:30px;height:30px;padding:0;border-radius:50%;
   border:1px solid var(--line);background:transparent;display:grid;place-items:center;cursor:pointer;
   transition:background .2s var(--eo),border-color .2s var(--eo),transform .24s var(--eo);}
@@ -95,6 +96,9 @@
 .rn-d-meta{display:flex;flex-wrap:wrap;gap:5px 16px;font-family:var(--mono);font-size:11px;color:var(--ink-2);border-top:1px solid var(--line-2);margin:18px 24px 0;padding-top:14px;}
 .rn-d-desc{font-family:var(--sans);font-size:14px;line-height:1.62;color:var(--ink-2);padding:14px 24px 0;text-wrap:pretty;}
 .rn-d-desc.rn-d-none{color:var(--ink-3);}
+.rn-d-topics{display:flex;flex-wrap:wrap;gap:6px;padding:14px 24px 0;}
+.rn-d-topics span{font-family:var(--mono);font-size:10.5px;letter-spacing:.02em;color:var(--ink-2);padding:3px 9px;border:1px solid var(--line-2);border-radius:999px;}
+#rn-svg.filtering .rn-repo.dim{pointer-events:none;}
 .rn-d-links{display:flex;flex-wrap:wrap;gap:8px 18px;padding:20px 24px 24px;}
 .rn-d-link{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--accent-d);text-decoration:none;
   border-bottom:1px solid var(--accent);padding-bottom:2px;transition:color .18s var(--eo),border-color .18s var(--eo);}
@@ -108,13 +112,12 @@
   #rn-svg .rn-dot,#rn-svg .rn-feat,#rn-svg .rn-pill{transition:none;}
 }
 @media(max-width:860px){
-  .rn-wrap{grid-template-columns:1fr;}
-  #rn-detail{order:2;min-height:0;border-radius:22px;}
+  .rn-wrap,.rr-wrap{grid-template-columns:1fr;}
+  .repo-card{order:2;min-height:0;border-radius:22px;}
 }
 
 /* ===== Radar ===== */
-#rr-stage{position:relative;width:100%;aspect-ratio:1180/720;}
-@media(max-width:720px){#rr-stage{aspect-ratio:1/1;}}
+#rr-stage{position:relative;width:100%;aspect-ratio:1/1;}
 #rr-svg{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;}
 #rr-svg.drag{cursor:grabbing;}
 .rr-ring{fill:none;stroke:var(--line);stroke-width:1;}
@@ -127,27 +130,14 @@
 :root[data-theme="dark"] .rr-lab,:root[data-theme="dark"] .rr-lab-n{fill:var(--fc-d);}
 .rr-dot{cursor:pointer;transform-box:fill-box;transform-origin:center;}
 #rr-svg{touch-action:pan-y;}
+.rr-dot:focus{outline:none;}
+.rr-dot:focus-visible{stroke:var(--ink);stroke-width:2px;}
 #rr-svg.narrow .rr-lab{font-size:20px;}
 #rr-svg.narrow .rr-lab-n{font-size:15px;}
 #rr-svg.narrow .rr-dot{stroke:var(--paper);stroke-width:.6px;}
 .rr-feat{fill:none;stroke:#C49A45;stroke-width:1;pointer-events:none;}
 #rr-svg.iso .rr-g:not(.on){opacity:.13;}
 .rr-g{transition:opacity .22s cubic-bezier(.23,1,.32,1);}
-
-/* Liquid Glass: one material, and only for the readout that genuinely floats
-   over the radar's rings and dots — there it has real geometry to refract.
-   The legend and hint sit over open paper, so they stay plain: glass with
-   nothing behind it is just a frosted rectangle. */
-#rr-tip{position:absolute;left:0;top:0;z-index:5;min-width:190px;max-width:280px;padding:13px 15px 14px;
-  background:var(--tip-bg);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
-  border:.5px solid var(--tip-edge);border-radius:18px;
-  box-shadow:0 .5px 0 var(--glass-spec) inset,0 -.5px 0 var(--glass-shade) inset,0 18px 44px -20px var(--glass-drop);
-  pointer-events:none;opacity:0;transform:translate(-50%,-118%);}
-#rr-tip.on{opacity:1;}
-.rr-t-k{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;}
-.rr-t-n{font-family:var(--sans);font-size:15px;font-weight:600;line-height:1.2;letter-spacing:-.015em;margin:5px 0 0;word-break:break-word;}
-.rr-t-m{font-family:var(--mono);font-size:10px;color:var(--ink-2);margin-top:7px;display:flex;gap:11px;flex-wrap:wrap;}
-.rr-t-d{font-size:12px;line-height:1.5;color:var(--ink-2);margin-top:8px;text-wrap:pretty;}
 
 /* legend: plain over paper, but rows keep concentric capsule radii */
 .rr-legend{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:6px;}
@@ -161,6 +151,3 @@
 .rr-l-sw{width:8px;height:8px;border-radius:50%;flex:none;transform:translateY(-1px);}
 .rr-l-nm{font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:-.005em;white-space:nowrap;}
 .rr-l-ct{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);padding-left:2px;}
-@media(prefers-reduced-transparency:reduce){
-  #rr-tip{background:var(--paper);backdrop-filter:none;-webkit-backdrop-filter:none;border-color:var(--line);}
-}

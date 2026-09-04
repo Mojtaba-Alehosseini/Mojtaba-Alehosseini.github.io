@@ -70,7 +70,7 @@
   }
 
   /* --- geometry: one evenly-spaced badge ring, nothing at a stray radius --- */
-  var C=390, RR=186, RB=212, RBL=228, RH=262, RBADGE=312, BR=22, GRP=9, GAPDEG=3.2;
+  var C=390, RR=214, RB=240, RBL=256, RH=280, RBADGE=322, BR=22, GRP=9, GAPDEG=3.2;
   function pol(r,deg){ var a=deg*Math.PI/180; return [C+r*Math.sin(a), C-r*Math.cos(a)]; }
   function arcPath(r,a0,a1,rev){
     var p0=pol(r,rev?a1:a0), p1=pol(r,rev?a0:a1), large=Math.abs(a1-a0)>180?1:0;
@@ -103,7 +103,7 @@
     idxInField[r.dom]=(idxInField[r.dom]||0); var k=DC[r.dom], j=idxInField[r.dom]++;
     var fa=fieldArc[r.dom], pad=Math.min(2.4,(fa.a1-fa.a0)*0.1);
     r._a = k===1 ? fa.mid : (fa.a0+pad)+j/(k-1)*((fa.a1-pad)-(fa.a0+pad));
-    r._cr=5+sizeT(r.s)*5.5; var p=pol(RR,r._a); r._x=p[0]; r._y=p[1];
+    r._cr=6+sizeT(r.s)*5.5; var p=pol(RR,r._a); r._x=p[0]; r._y=p[1];
   });
 
   var svg=E("svg",{id:"rn-svg",viewBox:"0 0 "+(C*2)+" "+(C*2),preserveAspectRatio:"xMidYMid meet"});
@@ -148,7 +148,7 @@
   ordered.forEach(function(r,i){
     var col=FIELD_C[r.dom];
     var g=E("g",{class:"rn-repo","data-i":i,"data-lang":r.lang,"data-dom":r.dom});
-    g.appendChild(E("circle",{class:"rn-hit",cx:r._x,cy:r._y,r:Math.max(r._cr+5,11),fill:"transparent"}));
+    g.appendChild(E("circle",{class:"rn-hit",cx:r._x,cy:r._y,r:Math.max(r._cr+6,13),fill:"transparent"}));
     g.appendChild(E("circle",{class:"rn-dot",cx:r._x,cy:r._y,r:r._cr,fill:col,stroke:darken(col,.3),"stroke-width":1}));
     if(r.f) g.appendChild(E("circle",{class:"rn-feat",cx:r._x,cy:r._y,r:r._cr+3,fill:"none",stroke:"#C49A45","stroke-width":1.1}));
     repoG.appendChild(g); repoEls.push(g);
@@ -269,7 +269,7 @@
     if(active&&active.type==="lang"){
       var p=pillByKey("lang",active.key), matched=ordered.filter(repoMatch), n=matched.length, ti=0;
       matched.forEach(function(r){
-        var rh=n>1? RH-16+(ti/(n-1))*32 : RH;
+        var rh=n>1? RH-14+(ti/(n-1))*28 : RH;
         var pth=E("path",{d:threadPath(RR+r._cr+4,r._a,p._r-BR-3,p._ang,rh),class:"rn-thread",pathLength:"1"});
         pth.style.animationDelay=Math.min(ti*0.028,0.4).toFixed(2)+"s";
         threads.appendChild(pth); ti++;
@@ -303,26 +303,21 @@
   /* the card is never empty: at rest it shows the newest featured repository */
   var DEFAULT=ordered.filter(function(r){ return r.f&&r.desc; }).sort(function(a,b){ return (b.y*100+b.m)-(a.y*100+a.m) || b.s-a.s; })[0] || ordered[0];
   var PREF=ordered.filter(function(r){ return r.n==="nl-to-sql-genbi"; })[0]; if(PREF&&PREF.desc) DEFAULT=PREF;
+  var selected=DEFAULT, revertTimer=null;
 
   function keyActivate(el,label,fn){
     el.setAttribute("tabindex","0"); el.setAttribute("role","button"); el.setAttribute("aria-label",label);
     el.addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); fn(); } });
   }
 
-  function closeDetail(){ hovered=null; detail.classList.remove("on"); if(DEFAULT) showDetail(DEFAULT,true); renderCenter(true); }
+  function closeDetail(){ hovered=null; selected=DEFAULT; detail.classList.remove("on"); if(DEFAULT) showDetail(DEFAULT,true); renderCenter(true); }
+  function select(r){ selected=r; hovered=r; showDetail(r,true); renderCenter(false); }
 
   function showDetail(r,anim){
     var col=LANG[r.lang]||LANG.Other;
-    detail.innerHTML=
-      (r!==DEFAULT?'<button class="rn-d-close" type="button" aria-label="Back"><svg viewBox="0 0 10 10"><path d="M1 1 L9 9 M9 1 L1 9"/></svg></button>':'')+
-      '<div class="rn-d-k" style="color:'+darken(FIELD_C[r.dom],.1)+'">'+esc((FIELD_LABEL[r.dom]||r.dom).toUpperCase())+'</div>'+
-      '<div class="rn-d-name">'+esc(r.n)+(r.f?' <span class="rn-d-star">★</span>':'')+'</div>'+
-      '<div class="rn-d-rule" style="background:'+FIELD_C[r.dom]+'"></div>'+
-      '<div class="rn-d-tags"><span><b>LANGUAGE</b><i style="background:'+col+'"></i>'+esc(r.lang)+'</span><span><b>FIELD</b><i style="background:'+FIELD_C[r.dom]+'"></i>'+esc(FIELD_LABEL[r.dom]||r.dom)+'</span></div>'+
-      '<div class="rn-d-meta"><span>'+r.y+'</span><span>'+fmt(r.s)+'</span>'+(r.t?'<span>'+r.t+' topics</span>':'')+'</div>'+
-      (r.desc?'<div class="rn-d-desc">'+esc(r.desc)+'</div>':'<div class="rn-d-desc rn-d-none">No description.</div>')+
-      '<div class="rn-d-links"><a class="rn-d-link" href="'+r.u+'" target="_blank" rel="noopener">View on GitHub <span>↗</span></a>'+
-      (r.hp?'<a class="rn-d-link alt" href="'+r.hp+'" target="_blank" rel="noopener">Live demo <span>↗</span></a>':'')+'</div>';
+    if(detail.dataset.repo===r.n) return;
+    detail.dataset.repo=r.n;
+    detail.innerHTML=window.repoCard(r,{fieldLabel:FIELD_LABEL[r.dom]||r.dom,fieldColor:FIELD_C[r.dom],langColor:col,closable:r!==DEFAULT});
     detail.classList.add("on");
     if(anim) animIn(detail);
     var cb=detail.querySelector(".rn-d-close");
@@ -343,21 +338,23 @@
         if(bandEls[r.dom]) bandEls[r.dom].classList.add("link");
       }
       /* brief hover intent so a sweep across the ring doesn't churn the readout */
-      hoverTimer=setTimeout(function(){ var fresh=!detail.classList.contains("on"); hovered=r; hoveredPill=null; hoveredField=null; renderCenter(false); showDetail(r,fresh); },70);
+      clearTimeout(revertTimer);
+      hoverTimer=setTimeout(function(){ var fresh=!detail.classList.contains("on"); hovered=r; hoveredPill=null; hoveredField=null; renderCenter(false); showDetail(r,fresh); },50);
     }
-    function leave(){ clearTimeout(hoverTimer); g.classList.remove("hot"); hoverThreads.innerHTML=""; pills.forEach(function(p){ p._el.classList.remove("link"); }); present.forEach(function(d){ bandEls[d].classList.remove("link"); }); hovered=null; renderCenter(false); }
+    function leave(){ clearTimeout(hoverTimer); g.classList.remove("hot"); hoverThreads.innerHTML=""; pills.forEach(function(p){ p._el.classList.remove("link"); }); present.forEach(function(d){ bandEls[d].classList.remove("link"); }); hovered=null; renderCenter(false);
+      clearTimeout(revertTimer); revertTimer=setTimeout(function(){ if(!hovered&&selected) showDetail(selected,false); },260); }
     g.addEventListener("mouseenter",enter);
     g.addEventListener("mouseleave",leave);
-    g.addEventListener("click",function(){ if(COARSE){ enter(); clearTimeout(hoverTimer); hovered=r; renderCenter(true); showDetail(r,true); return; } if(r.u) window.open(r.u,"_blank","noopener"); });
+    g.addEventListener("click",function(e){ e.stopPropagation(); clearTimeout(hoverTimer); clearTimeout(revertTimer); if(COARSE){ enter(); clearTimeout(hoverTimer); } select(r); });
     g.style.cursor="pointer";
   });
 
-  svg.addEventListener("click",function(e){ if(!e.target.closest(".rn-repo")&&!e.target.closest(".rn-pill")&&!e.target.closest(".rn-bandg")){ closeDetail(); } });
+  svg.addEventListener("click",function(e){ if(!e.target.closest(".rn-repo")&&!e.target.closest(".rn-pill")&&!e.target.closest(".rn-bandg")){ if(active){ active=null; applyFilter(); } } });
 
   /* one tab stop for the whole ring, arrow keys walk it */
   var kbIdx=0;
   repoG.setAttribute("tabindex","0"); repoG.setAttribute("role","group");
-  repoG.setAttribute("aria-label",N+" repositories — use the arrow keys to walk the ring, Enter to open on GitHub");
+  repoG.setAttribute("aria-label",N+" repositories — use the arrow keys to walk the ring, Enter to show one");
   function kbGo(i){ kbIdx=(i+repoEls.length)%repoEls.length; repoEls[kbIdx].dispatchEvent(new MouseEvent("mouseenter",{bubbles:true})); }
   repoG.addEventListener("focusin",function(){ kbGo(kbIdx); });
   function onKey(e){
@@ -370,7 +367,7 @@
     else if(k==="ArrowLeft"||k==="ArrowUp") kbGo(kbIdx-1);
     else if(k==="Home") kbGo(0);
     else if(k==="End") kbGo(repoEls.length-1);
-    else if(k==="Enter"){ var r=ordered[kbIdx]; if(r&&r.u) window.open(r.u,"_blank","noopener"); return; }
+    else if(k==="Enter"){ var r=ordered[kbIdx]; if(r) select(r); e.preventDefault(); return; }
     else if(k==="Escape"){ if(active){ active=null; applyFilter(); } else closeDetail(); return; }
     else return;
     e.preventDefault();
@@ -380,7 +377,7 @@
      HTML container carries the tab stop for the whole map */
   var fig=document.getElementById("rn-figure");
   fig.setAttribute("tabindex","0"); fig.setAttribute("role","group");
-  fig.setAttribute("aria-label","Repository map — "+N+" repositories. Arrow keys walk the ring, Enter opens the repository on GitHub, Escape resets.");
+  fig.setAttribute("aria-label","Repository map — "+N+" repositories. Arrow keys walk the ring, Enter shows the repository, Escape resets.");
   fig.addEventListener("keydown",onKey);
   fig.addEventListener("focusin",function(){ kbGo(kbIdx); });
   renderCenter(true);
@@ -400,7 +397,7 @@
         var d=g.querySelector(".rn-dot");
         try{ d.animate([{transform:"scale(.5)"},{transform:"scale(1)"}],{duration:420,delay:Math.min(i*11,500),easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"}); }catch(e){}
       });
-      try{ bandG.animate([{opacity:0},{opacity:1}],{duration:640,delay:120,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"}); }catch(e){}
+      try{ bandG.animate([{opacity:0},{opacity:1}],{duration:640,delay:120,easing:"cubic-bezier(.23,1,.32,1)",fill:"none"}); }catch(e){}
       pills.forEach(function(p,i){
         try{ p._el.animate([{transform:"scale(.8)"},{transform:"scale(1)"}],{duration:380,delay:260+i*34,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"}); }catch(e){}
       });
