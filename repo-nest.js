@@ -421,7 +421,6 @@
         var d=g.querySelector(".rn-dot");
         try{ d.animate([{transform:"scale(.5)"},{transform:"scale(1)"}],{duration:420,delay:Math.min(i*11,500),easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"}); }catch(e){}
       });
-      try{ bandG.animate([{opacity:0},{opacity:1}],{duration:640,delay:120,easing:"cubic-bezier(.23,1,.32,1)",fill:"none"}); }catch(e){}
       pills.forEach(function(p,i){
         try{ p._el.animate([{transform:"scale(.8)"},{transform:"scale(1)"}],{duration:380,delay:260+i*34,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"}); }catch(e){}
       });

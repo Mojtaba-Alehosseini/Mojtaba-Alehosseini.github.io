@@ -149,6 +149,8 @@
     activateBtn.addEventListener('pointerenter', () => {
       loadMediaPipeScripts().catch(() => {});
       preloadFrames();
+      // the transition video is not fetched on page load; fetch it on intent
+      if (transitionVideo) { transitionVideo.preload = 'auto'; try { transitionVideo.load(); } catch (e) {} }
     }, { once: true });
   }
 
@@ -200,6 +202,7 @@
     // the hand-demo instruction overlaid on top while everything loads.
     if (mobile) {
       webcamPanel.classList.remove('hidden');
+      { const gv = document.querySelector('.guide-video'); if (gv) { gv.play().catch(() => {}); } }
       if (camLoadingHint)  {
         camLoadingHint.classList.remove('hidden');
         camLoadingHint.play().catch(() => {});
@@ -281,6 +284,7 @@
     webcamFeed.srcObject = stream;
     try { await webcamFeed.play(); } catch (_) {}
     webcamPanel.classList.remove('hidden');
+      { const gv = document.querySelector('.guide-video'); if (gv) { gv.play().catch(() => {}); } }
 
     // ── Init MediaPipe Hands + manual frame pump ──────────────
     try {

@@ -14,6 +14,10 @@
   <meta property="og:description" content="M.Sc. Computer Science (Artificial Intelligence), University of Genoa." />
   <meta property="og:url" content="https://mojtaba-alehosseini.github.io/" />
   <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://mojtaba-alehosseini.github.io/assets/og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
 
   <link rel="canonical" href="https://mojtaba-alehosseini.github.io/" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2318181B'/%3E%3Ctext x='50%25' y='56%25' dominant-baseline='central' text-anchor='middle' font-family='-apple-system,Segoe UI,Helvetica,Arial,sans-serif' font-size='19' font-weight='600' fill='%23F7F3EA'%3EM%3C/text%3E%3C/svg%3E" />
@@ -29,9 +33,9 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="styles.css?v=20260904e" />
-  <link rel="stylesheet" href="viz.css?v=20260904e" />
-  <script src="portrait-interaction.js?v=20260904e" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20260905a" />
+  <link rel="stylesheet" href="viz.css?v=20260905a" />
+  <script src="portrait-interaction.js?v=20260905a" defer></script>
 </head>
 <body>
 
@@ -41,7 +45,7 @@
     <div class="top__inner">
       <a class="top__brand" href="/" aria-label="Mojtaba Alehosseini, home">MA</a>
       <div class="top__right">
-        <a class="top__play" href="https://mojtaba-alehosseini.github.io/folio-2025/" aria-label="Play: an interactive 3D world">
+        <a class="top__play" href="https://mojtaba-alehosseini.github.io/folio-2025/" aria-label="Play: a 3D world adapted from Bruno Simon's open-source folio" title="A 3D world, adapted from Bruno Simon's open-source folio-2025 (MIT)">
           <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
           <span>Play</span>
         </a>
@@ -83,8 +87,8 @@
         <figure class="portrait">
           <div class="portrait__frame" id="portraitContainer">
             <img class="portrait-layer portrait-bg" src="assets/photo-original.jpg" alt="" aria-hidden="true" />
-            <img class="portrait-layer portrait-cutout" src="assets/photo-cutout.png" alt="Portrait of Mojtaba Alehosseini" id="mainPortrait" loading="eager" />
-            <video id="transitionVideo" class="portrait-layer hidden" preload="auto" muted playsinline>
+            <img class="portrait-layer portrait-cutout" src="assets/photo-cutout.webp" alt="Portrait of Mojtaba Alehosseini" id="mainPortrait" loading="eager" />
+            <video id="transitionVideo" class="portrait-layer hidden" preload="metadata" muted playsinline>
               <source src="assets/cutout-to-origami-transparent.webm" type="video/webm" />
               <source src="assets/cutout-to-origami.mp4" type="video/mp4" />
             </video>
@@ -104,7 +108,7 @@
           <div class="webcam-wrapper">
             <video id="webcamFeed" autoplay playsinline muted></video>
             <canvas id="landmarkCanvas"></canvas>
-            <video id="camLoadingHint" class="cam-loading-hint hidden" src="assets/hand-demo.mp4" muted loop playsinline></video>
+            <video id="camLoadingHint" class="cam-loading-hint hidden" src="assets/hand-demo.mp4" preload="none" muted loop playsinline></video>
             <div id="camLoadingLabel" class="cam-loading-label hidden">Getting camera ready&hellip;</div>
             <div id="gestureBadge" class="gesture-badge">&mdash;</div>
             <button id="deactivateBtn" class="cam-close-btn" aria-label="Close camera">&#x2715;&nbsp;Stop</button>
@@ -124,7 +128,7 @@
                 </div>
               </div>
             </div>
-            <video class="guide-video" src="assets/hand-demo.mp4" autoplay muted loop playsinline></video>
+            <video class="guide-video" src="assets/hand-demo.mp4" preload="none" muted loop playsinline></video>
           </div>
         </div>
       </div>
@@ -163,11 +167,11 @@
 
   </main>
 
-  <script src="repos-data.js?v=20260904e" defer></script>
-  <script src="repo-card.js?v=20260904e" defer></script>
-  <script src="repo-nest.js?v=20260904e" defer></script>
-  <script src="repo-radar.js?v=20260904e" defer></script>
-  <script src="app.js?v=20260904e" defer></script>
+  <script src="repos-data.js?v=20260905a" defer></script>
+  <script src="repo-card.js?v=20260905a" defer></script>
+  <script src="repo-nest.js?v=20260905a" defer></script>
+  <script src="repo-radar.js?v=20260905a" defer></script>
+  <script src="app.js?v=20260905a" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       var n = document.querySelector('[data-repo-count]');

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://mojtaba-alehosseini.github.io/sitemap.xml
