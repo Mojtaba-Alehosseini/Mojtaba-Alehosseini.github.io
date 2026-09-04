@@ -219,7 +219,7 @@
     if(!el||!CLOCK_OK||!el.animate) return;
     var kids=el.children;
     for(var i=0;i<kids.length;i++){
-      try{ kids[i].animate([{transform:"translateY(6px)"},{transform:"none"}],{duration:340,delay:i*42,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"}); }catch(e){}
+      try{ kids[i].animate([{transform:"translateY(5px)",opacity:.6},{transform:"none",opacity:1}],{duration:260,delay:Math.min(i*24,140),easing:"cubic-bezier(.23,1,.32,1)"}); }catch(e){}
     }
     var rule=el.querySelector(".rn-d-rule");
     if(rule){ try{ rule.animate([{transform:"scaleX(0)"},{transform:"scaleX(1)"}],{duration:580,delay:90,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"}); }catch(e){} }
@@ -339,6 +339,8 @@
     if(detail.dataset.repo===r.n) return;
     detail.dataset.repo=r.n;
     detail.innerHTML=window.repoCard(r,{fieldLabel:FIELD_LABEL[r.dom]||r.dom,fieldColor:FIELD_C[r.dom],langColor:col,closable:r!==DEFAULT});
+    detail.scrollTop=0;
+    if(!anim&&CLOCK_OK&&detail.animate){ try{ detail.animate([{opacity:.45},{opacity:1}],{duration:150,easing:"ease-out"}); }catch(e){} }
     detail.classList.add("on");
     if(anim) animIn(detail);
     var cb=detail.querySelector(".rn-d-close");

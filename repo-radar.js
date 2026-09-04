@@ -196,7 +196,10 @@
     detail.innerHTML=window.repoCard(r,{fieldLabel:FIELD_LABEL[r._axis.key]||r._axis.label,fieldColor:r._axis.color,langColor:LANGC[r.lang]||LANGC.Other,closable:r!==DEFAULT});
     detail.classList.toggle("on",r!==DEFAULT);
     var cb=detail.querySelector(".rn-d-close"); if(cb) cb.addEventListener("click",function(e){ e.stopPropagation(); pin(DEFAULT); });
-    if(anim&&!REDUCED&&detail.animate){ var kids=detail.children; for(var i=0;i<kids.length;i++){ try{ kids[i].animate([{transform:"translateY(6px)"},{transform:"none"}],{duration:340,delay:i*42,easing:"cubic-bezier(.23,1,.32,1)",fill:"backwards"}); }catch(e){} } }
+    detail.scrollTop=0;
+    if(REDUCED||!detail.animate) return;
+    if(anim){ var kids=detail.children; for(var i=0;i<kids.length;i++){ try{ kids[i].animate([{transform:"translateY(5px)",opacity:.6},{transform:"none",opacity:1}],{duration:260,delay:Math.min(i*24,140),easing:"cubic-bezier(.23,1,.32,1)"}); }catch(e){} } }
+    else { try{ detail.animate([{opacity:.45},{opacity:1}],{duration:150,easing:"ease-out"}); }catch(e){} }
   }
   function preview(r){ clearTimeout(revert); card(r,false); }
   function unpreview(){ clearTimeout(revert); revert=setTimeout(function(){ card(pinned,false); },260); }
@@ -234,7 +237,7 @@
   });
 
   /* portrait containers crop to the radar's square core so phones aren't letterboxed */
-  function updateVB(){ var r=stage.getBoundingClientRect(); svg.setAttribute("viewBox","200 0 720 720"); svg.classList.toggle("narrow",r.width<560); }
+  function updateVB(){ var r=stage.getBoundingClientRect(); svg.setAttribute("viewBox","180 -20 760 760"); svg.classList.toggle("narrow",r.width<470); }
   window.addEventListener("resize",updateVB); updateVB();
   card(DEFAULT,false);
 
