@@ -117,7 +117,7 @@
   present.forEach(function(d,i){
     var fa=fieldArc[d], col=FIELD_C[d];
     var bg=E("g",{class:"rn-bandg","data-key":d});
-    bg.appendChild(E("path",{class:"rn-bandhit",d:arcPath(RB,fa.a0,fa.a1),stroke:"transparent",fill:"none","stroke-width":40}));
+    bg.appendChild(E("path",{class:"rn-bandhit",d:arcPath(RB+6,fa.a0,fa.a1),stroke:"transparent",fill:"none","stroke-width":26}));
     var bp=E("path",{d:arcPath(RB,fa.a0,fa.a1),class:"rn-band",stroke:col,fill:"none"});
     bg.appendChild(bp);
     var lower=fa.mid>90&&fa.mid<270;
@@ -235,10 +235,10 @@
       var hp=hoveredPill||{type:"cat",label:FIELD_LABEL[hoveredField]||hoveredField,color:FIELD_C[hoveredField],n:DC[hoveredField]};
       center.innerHTML='<div class="rn-name-k" style="color:'+darken(hp.color,.12)+'">'+(hp.type==="lang"?"LANGUAGE":"FIELD")+'</div>'+
         '<div class="rn-name rn-name-hov">'+esc(hp.label)+'</div>'+
-        '<div class="rn-name-s">'+hp.n+' '+(hp.n===1?"repository":"repositories")+' · click to filter</div>';
+        '<div class="rn-name-s">'+hp.n+' '+(hp.n===1?"repository":"repositories")+(active&&((hoveredPill&&active.type==="lang"&&active.key===hoveredPill.key)||(hoveredField&&active.type==="cat"&&active.key===hoveredField))?' · click to clear':' · click to filter')+'</div>';
     } else if(active){
       var cnt=ordered.filter(repoMatch).length, label=active.type==="lang"?active.key:(FIELD_LABEL[active.key]||active.key);
-      center.innerHTML='<div class="rn-name-k">Repositories in</div><div class="rn-name rn-name-filter">'+esc(label)+'</div><div class="rn-name-s">'+cnt+' of '+N+' · click again to reset</div>';
+      center.innerHTML='<div class="rn-name-k">'+(active.type==="lang"?"LANGUAGE":"FIELD")+'</div><div class="rn-name rn-name-filter">'+esc(label)+'</div><div class="rn-name-s">'+cnt+' of '+N+' repositories</div>';
     } else {
       center.innerHTML='<div class="rn-name-k">GitHub</div><div class="rn-name">'+N+' repositories</div>';
     }
@@ -276,6 +276,26 @@
       });
     }
     renderCenter(true);
+    if(active) showList(); else if(selected) showDetail(selected,true);
+  }
+
+  function showList(){
+    var isLang=active.type==="lang", label=isLang?active.key:(FIELD_LABEL[active.key]||active.key);
+    var col=isLang?LANG[active.key]:FIELD_C[active.key], list=ordered.filter(repoMatch);
+    detail.dataset.repo="";
+    detail.innerHTML='<button class="rn-d-close" type="button" aria-label="Clear the filter"><svg viewBox="0 0 10 10"><path d="M1 1 L9 9 M9 1 L1 9"/></svg></button>'+
+      '<div class="rn-d-k" style="color:'+darken(col,.1)+'">'+(isLang?"LANGUAGE":"FIELD")+'</div>'+
+      '<div class="rn-d-name">'+esc(label)+'</div>'+
+      '<div class="rn-d-rule" style="background:'+col+'"></div>'+
+      '<div class="rn-d-meta"><span>'+list.length+(list.length===1?' repository':' repositories')+'</span></div>'+
+      '<ul class="rn-d-list">'+list.map(function(r,i){ return '<li><button type="button" data-i="'+ordered.indexOf(r)+'"><i style="background:'+FIELD_C[r.dom]+'"></i>'+esc(r.n)+'</button></li>'; }).join('')+'</ul>';
+    detail.classList.add("on"); animIn(detail);
+    var cb=detail.querySelector(".rn-d-close"); if(cb) cb.addEventListener("click",function(e){ e.stopPropagation(); active=null; applyFilter(); });
+    detail.querySelectorAll(".rn-d-list button").forEach(function(b){
+      b.addEventListener("click",function(){ var r=ordered[+b.dataset.i]; active=null; applyFilter(); select(r); });
+      b.addEventListener("mouseenter",function(){ var g=repoEls[+b.dataset.i]; g.classList.add("hot"); });
+      b.addEventListener("mouseleave",function(){ var g=repoEls[+b.dataset.i]; g.classList.remove("hot"); });
+    });
   }
 
   pills.forEach(function(p){
@@ -310,8 +330,9 @@
     el.addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); fn(); } });
   }
 
-  function closeDetail(){ hovered=null; selected=DEFAULT; detail.classList.remove("on"); if(DEFAULT) showDetail(DEFAULT,true); renderCenter(true); }
-  function select(r){ selected=r; hovered=r; showDetail(r,true); renderCenter(false); }
+  function closeDetail(){ hovered=null; selected=DEFAULT; detail.classList.remove("on"); if(DEFAULT) showDetail(DEFAULT,true); markPin(); renderCenter(true); }
+  function markPin(){ repoEls.forEach(function(g,i){ g.classList.toggle("pin",ordered[i]===selected&&selected!==DEFAULT); }); }
+  function select(r){ selected=r; hovered=r; showDetail(r,true); markPin(); renderCenter(false); }
 
   function showDetail(r,anim){
     var col=LANG[r.lang]||LANG.Other;
@@ -331,7 +352,7 @@
       hoverThreads.innerHTML="";
       pills.forEach(function(p){ p._el.classList.remove("link"); });
       repoEls.forEach(function(o){ o.classList.remove("hot"); });
-      g.classList.add("hot"); g.parentNode.appendChild(g);
+      g.classList.add("hot");
       if(!active){
         var lp=pillByKey("lang",r.lang);
         if(lp){ lp._el.classList.add("link"); hoverThreads.appendChild(E("path",{d:threadPath(RR+r._cr+4,r._a,lp._r-BR-3,lp._ang,RH),class:"rn-thread",pathLength:"1"})); }
@@ -339,13 +360,13 @@
       }
       /* brief hover intent so a sweep across the ring doesn't churn the readout */
       clearTimeout(revertTimer);
-      hoverTimer=setTimeout(function(){ var fresh=!detail.classList.contains("on"); hovered=r; hoveredPill=null; hoveredField=null; renderCenter(false); showDetail(r,fresh); },50);
+      hoverTimer=setTimeout(function(){ hovered=r; hoveredPill=null; hoveredField=null; renderCenter(false); if(!active) showDetail(r,false); },30);
     }
     function leave(){ clearTimeout(hoverTimer); g.classList.remove("hot"); hoverThreads.innerHTML=""; pills.forEach(function(p){ p._el.classList.remove("link"); }); present.forEach(function(d){ bandEls[d].classList.remove("link"); }); hovered=null; renderCenter(false);
-      clearTimeout(revertTimer); revertTimer=setTimeout(function(){ if(!hovered&&selected) showDetail(selected,false); },260); }
+      clearTimeout(revertTimer); revertTimer=setTimeout(function(){ if(!hovered&&selected&&!active) showDetail(selected,false); },260); }
     g.addEventListener("mouseenter",enter);
     g.addEventListener("mouseleave",leave);
-    g.addEventListener("click",function(e){ e.stopPropagation(); clearTimeout(hoverTimer); clearTimeout(revertTimer); if(COARSE){ enter(); clearTimeout(hoverTimer); } select(r); });
+    g.addEventListener("click",function(e){ e.stopPropagation(); clearTimeout(hoverTimer); clearTimeout(revertTimer); if(active){ active=null; applyFilter(); } select(r); });
     g.style.cursor="pointer";
   });
 
@@ -356,7 +377,8 @@
   repoG.setAttribute("tabindex","0"); repoG.setAttribute("role","group");
   repoG.setAttribute("aria-label",N+" repositories — use the arrow keys to walk the ring, Enter to show one");
   function kbGo(i){ kbIdx=(i+repoEls.length)%repoEls.length; repoEls[kbIdx].dispatchEvent(new MouseEvent("mouseenter",{bubbles:true})); }
-  repoG.addEventListener("focusin",function(){ kbGo(kbIdx); });
+  function kbFocus(el){ try{ if(el.matches(":focus-visible")) kbGo(kbIdx); }catch(e){} }
+  repoG.addEventListener("focusin",function(){ kbFocus(repoG); });
   function onKey(e){
     var k=e.key;
     /* if focus feedback has not landed yet (some engines do not fire focus on a
@@ -379,7 +401,7 @@
   fig.setAttribute("tabindex","0"); fig.setAttribute("role","group");
   fig.setAttribute("aria-label","Repository map — "+N+" repositories. Arrow keys walk the ring, Enter shows the repository, Escape resets.");
   fig.addEventListener("keydown",onKey);
-  fig.addEventListener("focusin",function(){ kbGo(kbIdx); });
+  fig.addEventListener("focusin",function(e){ if(e.target===fig) kbFocus(fig); });
   renderCenter(true);
   if(DEFAULT) showDetail(DEFAULT,false);
 

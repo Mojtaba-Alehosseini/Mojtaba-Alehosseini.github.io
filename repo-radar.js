@@ -200,10 +200,10 @@
   }
   function preview(r){ clearTimeout(revert); card(r,false); }
   function unpreview(){ clearTimeout(revert); revert=setTimeout(function(){ card(pinned,false); },260); }
-  function pin(r){ clearTimeout(revert); pinned=r; card(r,true); }
+  function pin(r){ clearTimeout(revert); pinned=r; card(r,true); dotEls.forEach(function(c){ c.classList.toggle("pin",c._r===r&&r!==DEFAULT); }); }
   dotEls.forEach(function(c){
     c.addEventListener("pointerenter",function(){
-      c.setAttribute("r",(c._base*1.9).toFixed(1));   /* feedback on enter, not on click */
+      c.setAttribute("r",(c._base*1.6).toFixed(1));   /* feedback on enter, not on click */
       kick(); preview(c._r);
     });
     c.addEventListener("pointerleave",function(){
