@@ -1,0 +1,37 @@
+name: Sync repositories
+
+on:
+  schedule:
+    # 21:00 UTC is 23:00 in Italy in summer and 22:00 in winter.
+    - cron: "0 21 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build repos-data.js
+        run: python scripts/build_repos.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and push
+        run: |
+          git config user.name "Mojtaba Alehosseini"
+          git config user.email "alehoseini.mojtaba@gmail.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+          else
+            git commit -m "Sync repositories $(date -u +%Y-%m-%d)"
+          fi
+          git push
